@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.library.controller.AddBookDialogController"
+      spacing="20" style="-fx-background-color: white; -fx-background-radius: 12; -fx-min-width: 550;">
+
+    <padding>
+        <Insets top="25" right="25" bottom="25" left="25"/>
+    </padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Label text="📚" style="-fx-font-size: 28px;"/>
+        <VBox spacing="5">
+            <Label text="Add New Book" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <Label text="Enter book details to add to library inventory" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
+        </VBox>
+    </HBox>
+
+    <Separator/>
+
+    <!-- Book Details Form -->
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" maxHeight="450">
+        <VBox spacing="18">
+            <padding>
+                <Insets right="10"/>
+            </padding>
+
+            <!-- ISBN -->
+            <VBox spacing="8">
+                <Label text="ISBN *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <TextField fx:id="isbnField" promptText="e.g., 978-3-16-148410-0"
+                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+                <Label fx:id="isbnError" styleClass="error-label" managed="false" visible="false"/>
+            </VBox>
+
+            <!-- Title -->
+            <VBox spacing="8">
+                <Label text="Book Title *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <TextField fx:id="titleField" promptText="Enter book title"
+                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+                <Label fx:id="titleError" styleClass="error-label" managed="false" visible="false"/>
+            </VBox>
+
+            <!-- Author -->
+            <VBox spacing="8">
+                <Label text="Author *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <TextField fx:id="authorField" promptText="Enter author name"
+                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+                <Label fx:id="authorError" styleClass="error-label" managed="false" visible="false"/>
+            </VBox>
+
+            <!-- Category & Publisher Row -->
+            <HBox spacing="15">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Category *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <ComboBox fx:id="categoryComboBox" promptText="Select category" maxWidth="Infinity"
+                              style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 8;">
+                        <items>
+                            <FXCollections fx:factory="observableArrayList">
+                                <String fx:value="Fiction"/>
+                                <String fx:value="Non-Fiction"/>
+                                <String fx:value="Science"/>
+                                <String fx:value="Technology"/>
+                                <String fx:value="History"/>
+                                <String fx:value="Biography"/>
+                                <String fx:value="Self-Help"/>
+                                <String fx:value="Business"/>
+                                <String fx:value="Children"/>
+                                <String fx:value="Young Adult"/>
+                            </FXCollections>
+                        </items>
+                    </ComboBox>
+                    <Label fx:id="categoryError" styleClass="error-label" managed="false" visible="false"/>
+                </VBox>
+
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Publisher" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <TextField fx:id="publisherField" promptText="Publisher name"
+                               style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Publication Year & Edition Row -->
+            <HBox spacing="15">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Publication Year" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <Spinner fx:id="yearSpinner" min="1800" max="2025" initialValue="2024" editable="true" maxWidth="Infinity"
+                             style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5;"/>
+                </VBox>
+
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Edition" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <TextField fx:id="editionField" promptText="e.g., 1st, 2nd"
+                               style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Total Copies & Price Row -->
+            <HBox spacing="15">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Total Copies *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <Spinner fx:id="copiesSpinner" min="1" max="1000" initialValue="1" editable="true" maxWidth="Infinity"
+                             style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5;"/>
+                    <Label fx:id="copiesError" styleClass="error-label" managed="false" visible="false"/>
+                </VBox>
+
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Price ($)" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                    <TextField fx:id="priceField" promptText="0.00"
+                               style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Description -->
+            <VBox spacing="8">
+                <Label text="Description" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <TextArea fx:id="descriptionField" promptText="Enter book description (optional)" prefRowCount="4"
+                          style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+            </VBox>
+
+            <!-- Shelf Location -->
+            <VBox spacing="8">
+                <Label text="Shelf Location" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <TextField fx:id="shelfLocationField" promptText="e.g., A-12, Fiction Section"
+                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+
+    <!-- General Error/Success Message -->
+    <Label fx:id="generalMessage" wrapText="true" managed="false" visible="false"/>
+
+    <!-- Action Buttons -->
+    <HBox spacing="12" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+        <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel"
+                style="-fx-background-color: transparent; -fx-text-fill: #666666; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-color: #E0E0E0; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 25; -fx-cursor: hand;"/>
+
+        <Button fx:id="saveButton" text="Add Book" onAction="#handleSave" defaultButton="true"
+                style="-fx-background-color: #FF8C00; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 30; -fx-cursor: hand;">
+            <effect>
+                <javafx.scene.effect.DropShadow color="rgba(255, 140, 0, 0.3)" radius="8" offsetY="2"/>
+            </effect>
+        </Button>
+    </HBox>
+
+    <stylesheets>
+        <String fx:value="@../styles.css"/>
+    </stylesheets>
+</VBox>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.library.controller.AddLibrarianDialogController"
+      spacing="20" style="-fx-background-color: white; -fx-background-radius: 12; -fx-min-width: 500;">
+
+    <padding>
+        <Insets top="25" right="25" bottom="25" left="25"/>
+    </padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <Label text="👤" style="-fx-font-size: 28px;"/>
+        <VBox spacing="5">
+            <Label text="Register New Librarian" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
+            <Label text="Add a new librarian to the system" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
+        </VBox>
+    </HBox>
+
+    <Separator/>
+
+    <!-- Librarian Details Form -->
+    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" maxHeight="450">
+        <VBox spacing="18">
+            <padding>
+                <Insets right="10"/>
+            </padding>
+
+            <!-- Employee ID -->
+            <VBox spacing="8">
+                <Label text="Employee ID *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <TextField fx:id="employeeIdField" promptText="e.g., LIB-001"
+                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+                <Label fx:id="employeeIdError" styleClass="error-label" managed="false" visible="false"/>
+                <Label text="This will be used as the librarian's login username" style="-fx-text-fill: #999999; -fx-font-size: 11px;"/>
+            </VBox>
+
+            <!-- Full Name -->
+            <VBox spacing="8">
+                <Label text="Full Name *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <TextField fx:id="fullNameField" promptText="Enter full name"
+                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+                <Label fx:id="fullNameError" styleClass="error-label" managed="false" visible="false"/>
+            </VBox>
+
+            <!-- Email -->
+            <VBox spacing="8">
+                <Label text="Email Address *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <TextField fx:id="emailField" promptText="librarian@library.com"
+                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+                <Label fx:id="emailError" styleClass="error-label" managed="false" visible="false"/>
+            </VBox>
+
+            <!-- Phone Number -->
+            <VBox spacing="8">
+                <Label text="Phone Number *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <TextField fx:id="phoneField" promptText="+1 (555) 000-0000"
+                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+                <Label fx:id="phoneError" styleClass="error-label" managed="false" visible="false"/>
+            </VBox>
+
+            <!-- Address -->
+            <VBox spacing="8">
+                <Label text="Address" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <TextArea fx:id="addressField" promptText="Enter address (optional)" prefRowCount="3"
+                          style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+            </VBox>
+
+            <Separator/>
+
+            <Label text="Account Credentials" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #FF8C00;"/>
+
+            <!-- Initial Password -->
+            <VBox spacing="8">
+                <Label text="Initial Password *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <PasswordField fx:id="passwordField" promptText="Create initial password"
+                               style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+                <Label fx:id="passwordError" styleClass="error-label" managed="false" visible="false"/>
+                <Label text="Password must be at least 8 characters" style="-fx-text-fill: #999999; -fx-font-size: 11px;"/>
+            </VBox>
+
+            <!-- Confirm Password -->
+            <VBox spacing="8">
+                <Label text="Confirm Password *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <PasswordField fx:id="confirmPasswordField" promptText="Re-enter password"
+                               style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+                <Label fx:id="confirmPasswordError" styleClass="error-label" managed="false" visible="false"/>
+            </VBox>
+
+            <!-- Access Level / Permissions -->
+            <VBox spacing="8">
+                <Label text="Access Level" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+                <VBox spacing="8" style="-fx-background-color: #FFF5EE; -fx-background-radius: 8; -fx-padding: 12;">
+                    <CheckBox fx:id="canApproveRequestsCheckbox" text="Can approve borrow requests" selected="true"
+                              style="-fx-text-fill: #666666; -fx-font-size: 13px;"/>
+                    <CheckBox fx:id="canIssueReturnsCheckbox" text="Can issue and return books" selected="true"
+                              style="-fx-text-fill: #666666; -fx-font-size: 13px;"/>
+                    <CheckBox fx:id="canRevokeMembershipCheckbox" text="Can revoke memberships" selected="false"
+                              style="-fx-text-fill: #666666; -fx-font-size: 13px;"/>
+                </VBox>
+            </VBox>
+        </VBox>
+    </ScrollPane>
+
+    <!-- General Error/Success Message -->
+    <Label fx:id="generalMessage" wrapText="true" managed="false" visible="false"/>
+
+    <!-- Action Buttons -->
+    <HBox spacing="12" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+        <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel"
+                style="-fx-background-color: transparent; -fx-text-fill: #666666; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-color: #E0E0E0; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 25; -fx-cursor: hand;"/>
+
+        <Button fx:id="registerButton" text="Register Librarian" onAction="#handleRegister" defaultButton="true"
+                style="-fx-background-color: #FF8C00; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 30; -fx-cursor: hand;">
+            <effect>
+                <javafx.scene.effect.DropShadow color="rgba(255, 140, 0, 0.3)" radius="8" offsetY="2"/>
+            </effect>
+        </Button>
+    </HBox>
+
+    <stylesheets>
+        <String fx:value="@../styles.css"/>
+    </stylesheets>
+</VBox>

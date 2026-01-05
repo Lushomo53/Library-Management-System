@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<?import java.lang.String?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.library.controller.MembershipApplicationController"
+      alignment="CENTER" spacing="25"
+      style="-fx-background-color: linear-gradient(to bottom, #FFFFFF 0%, #FFF5EE 100%);">
+
+    <padding>
+        <Insets top="40" right="40" bottom="40" left="40"/>
+    </padding>
+
+    <!-- Header Section -->
+    <VBox alignment="CENTER" spacing="10">
+        <Label text="📝" style="-fx-font-size: 50px;"/>
+        <Label text="Membership Application" styleClass="title-label">
+            <font>
+                <Font name="System Bold" size="24"/>
+            </font>
+        </Label>
+        <Label text="Join our library community today" style="-fx-text-fill: #666666; -fx-font-size: 14px;"/>
+    </VBox>
+
+    <!-- Application Form -->
+    <VBox spacing="20" maxWidth="500" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);">
+        <padding>
+            <Insets top="35" right="35" bottom="35" left="35"/>
+        </padding>
+
+        <Label text="Personal Information" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #FF8C00;"/>
+
+        <!-- Full Name -->
+        <VBox spacing="8">
+            <Label text="Full Name *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+            <TextField fx:id="fullNameField" promptText="Enter your full name"
+                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+            <Label fx:id="fullNameError" styleClass="error-label" managed="false" visible="false"/>
+        </VBox>
+
+        <!-- Email -->
+        <VBox spacing="8">
+            <Label text="Email Address *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+            <TextField fx:id="emailField" promptText="your.email@example.com"
+                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+            <Label fx:id="emailError" styleClass="error-label" managed="false" visible="false"/>
+        </VBox>
+
+        <!-- Phone Number -->
+        <VBox spacing="8">
+            <Label text="Phone Number *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+            <TextField fx:id="phoneField" promptText="+260 XXXX XXXXXX"
+                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+            <Label fx:id="phoneError" styleClass="error-label" managed="false" visible="false"/>
+        </VBox>
+
+        <!-- Address -->
+        <VBox spacing="8">
+            <Label text="Address *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+            <TextArea fx:id="addressField" promptText="Enter your full address" prefRowCount="3"
+                      style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+            <Label fx:id="addressError" styleClass="error-label" managed="false" visible="false"/>
+        </VBox>
+
+        <Separator style="-fx-padding: 5 0;"/>
+
+        <Label text="Account Credentials" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #FF8C00;"/>
+
+        <!-- Username -->
+        <VBox spacing="8">
+            <Label text="Desired Username *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+            <TextField fx:id="usernameField" promptText="Choose a username"
+                       style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+            <Label fx:id="usernameError" styleClass="error-label" managed="false" visible="false"/>
+        </VBox>
+
+        <!-- Password -->
+        <VBox spacing="8">
+            <Label text="Password *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+            <PasswordField fx:id="passwordField" promptText="Create a strong password"
+                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+            <Label fx:id="passwordError" styleClass="error-label" managed="false" visible="false"/>
+            <Label text="Password must be at least 8 characters" style="-fx-text-fill: #999999; -fx-font-size: 11px;"/>
+        </VBox>
+
+        <!-- Confirm Password -->
+        <VBox spacing="8">
+            <Label text="Confirm Password *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+            <PasswordField fx:id="confirmPasswordField" promptText="Re-enter your password"
+                           style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
+            <Label fx:id="confirmPasswordError" styleClass="error-label" managed="false" visible="false"/>
+        </VBox>
+
+        <!-- General Success/Error Message -->
+        <Label fx:id="generalMessage" wrapText="true" managed="false" visible="false"/>
+
+        <!-- Action Buttons -->
+        <HBox spacing="15" alignment="CENTER" style="-fx-padding: 10 0 0 0;">
+            <Button fx:id="submitButton" text="Submit Application" onAction="#handleSubmit" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                    style="-fx-background-color: #FF8C00; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 14; -fx-cursor: hand;">
+                <effect>
+                    <javafx.scene.effect.DropShadow color="rgba(255, 140, 0, 0.3)" radius="8" offsetY="2"/>
+                </effect>
+            </Button>
+
+            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                    style="-fx-background-color: transparent; -fx-text-fill: #666666; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-color: #E0E0E0; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 14; -fx-cursor: hand;"/>
+        </HBox>
+
+        <!-- Back to Login -->
+        <HBox alignment="CENTER" spacing="5" style="-fx-padding: 5 0 0 0;">
+            <Label text="Already have an account?" style="-fx-text-fill: #666666; -fx-font-size: 12px;"/>
+            <Hyperlink fx:id="backToLoginLink" text="Back to Login" onAction="#handleBackToLogin"
+                       style="-fx-text-fill: #FF8C00; -fx-font-size: 12px; -fx-font-weight: bold; -fx-border-width: 0;"/>
+        </HBox>
+    </VBox>
+
+    <stylesheets>
+        <String fx:value="/styles.css"/>
+    </stylesheets>
+</VBox>
