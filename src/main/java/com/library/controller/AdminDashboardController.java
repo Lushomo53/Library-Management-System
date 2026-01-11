@@ -771,7 +771,7 @@ public class AdminDashboardController implements Initializable {
                                "FULL_NAME", member.getFullName(),
                                "USERNAME", member.getUsername(),
                                "APPROVAL_DATE", LocalDateTime.now().toString(),
-                               "LOGO_URL", ""
+                               "LOGO_URL", "https://github.com/Lushomo53/Library-Management-System/blob/master/src/main/resources/images/logo.jpg?raw=true"
                             )
                     );
 
