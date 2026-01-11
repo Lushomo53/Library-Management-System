@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Borrow Request Update</title>
+</head>
+<body style="margin:0; padding:0; font-family:'Segoe UI', Arial, sans-serif; background-color:#f4f6f8;">
+<table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td align="center" style="padding:30px 0;">
+            <table width="600" style="background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.08);">
+
+                <!-- Header -->
+                <tr>
+                    <td align="center" style="background:#d32f2f; padding:25px;">
+                        <img src="{{logoUrl}}" alt="Library Logo" width="80" style="margin-bottom:10px;">
+                        <h1 style="margin:0; color:#ffffff;">Borrow Request Update</h1>
+                    </td>
+                </tr>
+
+                <!-- Body -->
+                <tr>
+                    <td style="padding:30px; color:#333333;">
+                        <p style="font-size:16px;">Hello <strong>{{memberName}}</strong>,</p>
+
+                        <p style="font-size:15px;">
+                            Thank you for your interest in borrowing the following book:
+                        </p>
+
+                        <table width="100%" style="margin:20px 0; border-collapse:collapse;">
+                            <tr>
+                                <td style="padding:8px; font-weight:bold;">Book Title:</td>
+                                <td style="padding:8px;">{{bookTitle}}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:8px; font-weight:bold;">Author:</td>
+                                <td style="padding:8px;">{{author}}</td>
+                            </tr>
+                        </table>
+
+                        <p style="font-size:15px;">
+                            Unfortunately, your borrow request could not be approved at this time.
+                        </p>
+
+                        <p style="font-size:15px;">
+                            <strong>Reason:</strong><br>
+                            {{rejectionReason}}
+                        </p>
+
+                        <p style="font-size:15px;">
+                            <strong>What you can do next:</strong>
+                        </p>
+                        <ul style="font-size:15px; padding-left:20px;">
+                            <li>Check the availability of the book at a later date.</li>
+                            <li>Ensure you have no overdue books or outstanding fines.</li>
+                            <li>Submit a new borrow request once the issue has been resolved.</li>
+                        </ul>
+
+                        <p style="margin-top:30px;">
+                            If you need further assistance, please contact the library staff.
+                        </p>
+
+                        <p>
+                            Regards,<br>
+                            <strong>{{libraryName}}</strong>
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td align="center" style="background:#f1f1f1; padding:15px; font-size:12px; color:#777;">
+                        This is an automated notification from the Library Management System.
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

@@ -4,34 +4,41 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-
 <?import java.lang.String?>
+
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.library.controller.ApproveRequestDialogController"
-      spacing="15" styleClass="dialog-container">
+      styleClass="dialog-container" minWidth="500" maxWidth="600" prefWidth="550">
     
     <padding>
-        <Insets topRightBottomLeft="20"/>
+        <Insets top="20" right="20" bottom="15" left="20"/>
     </padding>
+    
+    <!-- Fixed Header (Not scrollable) -->
+    <HBox alignment="CENTER_LEFT" spacing="12" styleClass="dialog-header">
+        <Label text="✅" styleClass="dialog-icon"/>
+        <VBox spacing="3">
+            <Label text="Approve Borrow Request" styleClass="dialog-title"/>
+            <Label text="Set borrowing parameters for this request" styleClass="dialog-subtitle"/>
+        </VBox>
+    </HBox>
+    
+    <Separator styleClass="dialog-separator">
+        <VBox.margin>
+            <Insets top="5" bottom="5"/>
+        </VBox.margin>
+    </Separator>
 
-    <!-- Book Details Form -->
+    <!-- Scrollable Content Area -->
     <ScrollPane fitToWidth="true" styleClass="form-scroll-pane"
-                maxHeight="800" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+                prefHeight="400" maxHeight="500" 
+                hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                VBox.vgrow="ALWAYS">
         <VBox spacing="15">
             <padding>
-                <Insets right="8"/>
+                <Insets top="5" right="8" bottom="5" left="5"/>
             </padding>
-            <!-- Header -->
-            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="dialog-header">
-                <Label text="✅" styleClass="dialog-icon"/>
-                <VBox spacing="3">
-                    <Label text="Approve Borrow Request" styleClass="dialog-title"/>
-                    <Label text="Set borrowing parameters for this request" styleClass="dialog-subtitle"/>
-                </VBox>
-            </HBox>
-
-            <Separator styleClass="dialog-separator"/>
-
+            
             <!-- Request Details (Read-only) -->
             <VBox spacing="12" styleClass="info-section">
                 <padding>
@@ -68,11 +75,11 @@
                 </GridPane>
             </VBox>
 
-            <Separator styleClass="dialog-separator"/>
+            <Separator styleClass="section-divider"/>
 
             <!-- Borrowing Parameters -->
             <VBox spacing="12">
-                <Label text="⚙️Set Borrowing Parameters" styleClass="section-header-with-icon"/>
+                <Label text="⚙️ Set Borrowing Parameters" styleClass="section-header-with-icon"/>
 
                 <!-- Borrow Duration -->
                 <VBox spacing="6">
@@ -122,23 +129,53 @@
             <!-- General Error/Success Message -->
             <Label fx:id="generalMessage" wrapText="true" managed="false" visible="false"
                    styleClass="message-label"/>
-
-            <!-- Action Buttons -->
-            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="dialog-button-bar">
-                <padding>
-                    <Insets top="5"/>
-                </padding>
-
-                <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel"
-                        styleClass="dialog-cancel-button" cancelButton="true"/>
-
-                <Button fx:id="approveButton" text="✓ Approve &amp; Issue Book" onAction="#handleApprove"
-                        defaultButton="true" styleClass="dialog-approve-button"/>
-            </HBox>
+            
+            <!-- Spacer at bottom for better scrolling -->
+            <Region prefHeight="10"/>
         </VBox>
     </ScrollPane>
+
+    <!-- Fixed Footer (Not scrollable) -->
+    <VBox spacing="8">
+        <VBox.margin>
+            <Insets top="10"/>
+        </VBox.margin>
+        
+        <Separator styleClass="dialog-separator"/>
+        
+        <!-- Action Buttons -->
+        <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="dialog-button-bar">
+            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel"
+                    styleClass="dialog-cancel-button" cancelButton="true"/>
+
+            <Button fx:id="approveButton" text="✓ Approve &amp; Issue Book" onAction="#handleApprove"
+                    defaultButton="true" styleClass="dialog-approve-button"/>
+        </HBox>
+    </VBox>
 
     <stylesheets>
         <String fx:value="/styles.css"/>
     </stylesheets>
 </VBox>
+
+<!-- 
+Key Changes for Scrollability:
+1. Moved header OUTSIDE ScrollPane (fixed at top)
+2. Moved action buttons OUTSIDE ScrollPane (fixed at bottom)
+3. Only form content is scrollable
+4. Set prefHeight="400" and maxHeight="500" on ScrollPane
+5. Added VBox.vgrow="ALWAYS" to ScrollPane for flexible height
+6. Added dialog size constraints: minWidth="500" maxWidth="600" prefWidth="550"
+7. Added separators between fixed and scrollable sections
+8. Added bottom spacer (Region) for better scroll experience
+9. Adjusted padding in scrollable area
+10. Better visual separation between fixed and scrollable content
+
+Benefits:
+- Header always visible
+- Buttons always accessible
+- Content scrolls smoothly
+- Dialog maintains reasonable size
+- No overflow issues
+- Better UX for long forms
+-->

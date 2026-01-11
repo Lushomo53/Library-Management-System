@@ -8,6 +8,8 @@ import com.library.model.Book;
 import com.library.model.BorrowRequest;
 import com.library.model.BorrowedBook;
 import com.library.model.User;
+import com.library.util.EmailService;
+import com.library.util.EmailTemplateLoader;
 import com.library.util.SceneManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -29,6 +31,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class LibrarianDashboardController implements Initializable {
@@ -331,39 +334,89 @@ public class LibrarianDashboardController implements Initializable {
         loadRequests();
         SceneManager.showInfo("Refreshed", "Requests refreshed successfully!");
     }
-    
+
     private void handleApproveRequest(BorrowRequest request) {
         try {
-            // Open approve dialog
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ApproveRequestDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/ApproveRequestDialog.fxml")
+            );
             Parent root = loader.load();
-            
+
             ApproveRequestDialogController controller = loader.getController();
             controller.setRequest(request);
             controller.setLibrarian(currentUser);
-            
+
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Approve Borrow Request");
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.initOwner(requestsTabButton.getScene().getWindow());
             dialogStage.setScene(new Scene(root));
-            
-            // Set callback
+
             controller.setOnApproved(() -> {
+
+                // UI refresh
                 loadStatistics();
                 loadRequests();
                 dialogStage.close();
+
+                // SEND EMAIL (background thread)
+                new Thread(() -> {
+                    try {
+                        String template = EmailTemplateLoader.loadTemplate("borrow-approved.html");
+
+                        // Refresh the request object
+                        BorrowRequest updatedRequest = borrowRequestDAO.findById(request.getRequestId());
+                        updatedRequest.setMember(request.getMember());
+                        updatedRequest.setBook(request.getBook());
+
+                        Map<String, String> values = getStringMap(updatedRequest);
+
+                        String html = EmailTemplateLoader.render(template, values);
+
+                        EmailService.sendHtmlEmail(
+                                request.getMember().getEmail(),
+                                "Borrow Request Approved – " + request.getBook().getTitle(),
+                                html
+                        );
+
+                    } catch (Exception e) {
+                        System.err.println("Failed to send borrow approval email");
+                        e.printStackTrace();
+                    }
+                }).start();
+
             });
-            
+
             dialogStage.showAndWait();
-            
+
         } catch (IOException e) {
             System.err.println("Error opening approve dialog: " + e.getMessage());
             e.printStackTrace();
-            SceneManager.showError("Error", "Failed to open approval dialog: " + e.getMessage());
+            SceneManager.showError(
+                    "Error",
+                    "Failed to open approval dialog: " + e.getMessage()
+            );
         }
     }
-    
+
+    private static Map<String, String> getStringMap(BorrowRequest request) {
+        LocalDate approvedDate = request.getApprovedDate().toLocalDate();
+        LocalDate dueDate = approvedDate.plusDays(request.getBorrowDurationDays());
+
+        Map<String, String> values = Map.of(
+                "logoUrl", "https://github.com/Lushomo53/Library-Management-System/blob/master/src/main/resources/images/logo.jpg?raw=true",
+                "memberName", request.getMember().getFullName(),
+                "bookTitle", request.getBook().getTitle(),
+                "author", request.getBook().getAuthor(),
+                "approvalDate", approvedDate.toString(),
+                "dueDate", dueDate.toString(),
+                "borrowDays", request.getBorrowDurationDays().toString(),
+                "notes", request.getNotes() != null ? request.getNotes() : "None",
+                "libraryName", "Library Management System"
+        );
+        return values;
+    }
+
     private void handleRejectRequest(BorrowRequest request) {
         // Show reason dialog
         TextInputDialog dialog = new TextInputDialog();
