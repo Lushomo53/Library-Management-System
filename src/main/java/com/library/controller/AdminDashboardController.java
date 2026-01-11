@@ -5,6 +5,8 @@ import com.library.dao.BorrowedBookDAO;
 import com.library.dao.UserDAO;
 import com.library.model.Book;
 import com.library.model.User;
+import com.library.util.EmailService;
+import com.library.util.EmailTemplateLoader;
 import com.library.util.SceneManager;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,14 +19,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class AdminDashboardController implements Initializable {
@@ -40,6 +45,7 @@ public class AdminDashboardController implements Initializable {
     @FXML private Button reportsTabButton;
     
     // Content views
+    @FXML private StackPane contentPane;
     @FXML private VBox stockView;
     @FXML private VBox librariansView;
     @FXML private VBox membersView;
@@ -757,6 +763,24 @@ public class AdminDashboardController implements Initializable {
             if (success) {
                 SceneManager.showInfo("Success", "Membership approved successfully!");
                 loadMembersData();
+                new Thread(() -> {
+                    String template = EmailTemplateLoader.loadTemplate("membership-approved.html");
+                    String html = EmailTemplateLoader.render(
+                            template,
+                            Map.of(
+                               "FULL_NAME", member.getFullName(),
+                               "USERNAME", member.getUsername(),
+                               "APPROVAL_DATE", LocalDateTime.now().toString(),
+                               "LOGO_URL", ""
+                            )
+                    );
+
+                    EmailService.sendHtmlEmail(
+                            member.getEmail(),
+                            "Membership Approval",
+                            html
+                    );
+                }).start();
             } else {
                 SceneManager.showError("Error", "Failed to approve membership.");
             }

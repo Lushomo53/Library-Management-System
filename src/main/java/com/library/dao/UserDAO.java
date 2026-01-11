@@ -2,6 +2,7 @@ package com.library.dao;
 
 import com.library.model.User;
 import com.library.util.DatabaseConnection;
+import com.library.util.PasswordUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -21,19 +22,20 @@ public class UserDAO {
      * @return User object if authentication successful, null otherwise
      */
     public User authenticate(String username, String password, String role) {
-        String query = "SELECT * FROM users WHERE username = ? AND password = ? AND role = ? AND status = 'ACTIVE'";
+        String query = "SELECT * FROM users WHERE username = ? AND role = ? AND status = 'ACTIVE'";
         
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             
             pstmt.setString(1, username);
-            pstmt.setString(2, password); // In production, hash the password first
-            pstmt.setString(3, role);
+            pstmt.setString(2, role);
             
             ResultSet rs = pstmt.executeQuery();
             
             if (rs.next()) {
-                return extractUserFromResultSet(rs);
+                User user = extractUserFromResultSet(rs);
+                if (PasswordUtil.verifyPassword(password, user.getPassword())) return user;
+                else return null;
             }
             
         } catch (SQLException e) {
@@ -144,44 +146,66 @@ public class UserDAO {
      * Create a new user
      */
     public boolean createUser(User user) {
-        String query = "INSERT INTO users (username, password, role, full_name, email, phone, address, status, " +
-                      "employee_id, member_id, can_approve_requests, can_issue_returns, can_revoke_membership, created_at) " +
-                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            
-            pstmt.setString(1, user.getUsername());
-            pstmt.setString(2, user.getPassword()); // Hash in production
-            pstmt.setString(3, user.getRole());
-            pstmt.setString(4, user.getFullName());
-            pstmt.setString(5, user.getEmail());
-            pstmt.setString(6, user.getPhone());
-            pstmt.setString(7, user.getAddress());
-            pstmt.setString(8, user.getStatus());
-            pstmt.setString(9, user.getEmployeeId());
-            pstmt.setString(10, user.getMemberId());
-            pstmt.setBoolean(11, user.isCanApproveRequests());
-            pstmt.setBoolean(12, user.isCanIssueReturns());
-            pstmt.setBoolean(13, user.isCanRevokeMembership());
-            
-            int affectedRows = pstmt.executeUpdate();
-            
-            if (affectedRows > 0) {
-                ResultSet generatedKeys = pstmt.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    user.setUserId(generatedKeys.getInt(1));
-                }
-                return true;
+
+        String sql =
+                "INSERT INTO users (" +
+                        "username, password, role, full_name, email, phone, address, status, " +
+                        "employee_id, member_id, can_approve_requests, can_issue_returns, can_revoke_membership, created_at" +
+                        ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
+
+        try (Connection conn = DatabaseConnection.getConnection()) {
+
+            conn.setAutoCommit(false); // 🔒 START TRANSACTION
+
+            String employeeId = null;
+            String memberId = null;
+
+            if ("MEMBER".equals(user.getRole())) {
+                memberId = generateID(conn, "MEMBER");
+            } else {
+                employeeId = generateID(conn, user.getRole());
             }
-            
+
+            try (PreparedStatement pstmt =
+                         conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+                pstmt.setString(1, user.getUsername());
+                pstmt.setString(2, user.getPassword());
+                pstmt.setString(3, user.getRole());
+                pstmt.setString(4, user.getFullName());
+                pstmt.setString(5, user.getEmail());
+                pstmt.setString(6, user.getPhone());
+                pstmt.setString(7, user.getAddress());
+                pstmt.setString(8, user.getStatus());
+                pstmt.setString(9, employeeId);
+                pstmt.setString(10, memberId);
+                pstmt.setBoolean(11, user.isCanApproveRequests());
+                pstmt.setBoolean(12, user.isCanIssueReturns());
+                pstmt.setBoolean(13, user.isCanRevokeMembership());
+
+                int affectedRows = pstmt.executeUpdate();
+
+                if (affectedRows == 0) {
+                    conn.rollback();
+                    return false;
+                }
+
+                try (ResultSet keys = pstmt.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        user.setUserId(keys.getInt(1));
+                    }
+                }
+            }
+
+            conn.commit(); // ✅ SUCCESS
+            return true;
+
         } catch (SQLException e) {
-            System.err.println("Error creating user: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
-        
-        return false;
     }
+
 
     /**
      * Update existing user
@@ -353,4 +377,43 @@ public class UserDAO {
         
         return user;
     }
+
+    private String generateID(Connection conn, String role) throws SQLException {
+
+        // Lock the row for this role
+        String selectSql =
+                "SELECT next_value FROM role_id_sequence WHERE role = ? FOR UPDATE";
+
+        String updateSql =
+                "UPDATE role_id_sequence SET next_value = ? WHERE role = ?";
+
+        int nextValue;
+
+        try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
+            selectStmt.setString(1, role);
+
+            try (ResultSet rs = selectStmt.executeQuery()) {
+                if (!rs.next()) {
+                    throw new SQLException("No ID sequence found for role: " + role);
+                }
+                nextValue = rs.getInt(1);
+            }
+        }
+
+        try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+            updateStmt.setInt(1, nextValue + 1);
+            updateStmt.setString(2, role);
+            updateStmt.executeUpdate();
+        }
+
+        String prefix = switch (role) {
+            case "ADMIN" -> "ADM";
+            case "LIBRARIAN" -> "LIB";
+            case "MEMBER" -> "MEM";
+            default -> throw new IllegalArgumentException("Invalid role: " + role);
+        };
+
+        return prefix + "-" + String.format("%04d", nextValue);
+    }
+
 }

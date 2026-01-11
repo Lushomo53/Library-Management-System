@@ -41,3 +41,13 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# ======================
+# Google OAuth Secrets
+# ======================
+google-client-secret.json
+src/main/resources/google-client-secret.json
+
+# OAuth token storage (if you add it later)
+tokens/
+credentials/

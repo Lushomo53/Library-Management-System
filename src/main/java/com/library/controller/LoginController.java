@@ -13,18 +13,27 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
 
-    @FXML private TextField usernameField;
-    @FXML private PasswordField passwordField;
-    @FXML private ComboBox<String> roleComboBox;
-    @FXML private Button loginButton;
-    @FXML private Hyperlink applyMembershipLink;
-    
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private ComboBox<String> roleComboBox;
+    @FXML
+    private Button loginButton;
+    @FXML
+    private Hyperlink applyMembershipLink;
+
     // Error labels
-    @FXML private Label usernameError;
-    @FXML private Label passwordError;
-    @FXML private Label roleError;
-    @FXML private Label generalError;
-    
+    @FXML
+    private Label usernameError;
+    @FXML
+    private Label passwordError;
+    @FXML
+    private Label roleError;
+    @FXML
+    private Label generalError;
+
     private UserDAO userDAO;
 
     @Override
@@ -42,6 +51,25 @@ public class LoginController implements Initializable {
         roleComboBox.valueProperty().addListener((obs, oldVal, newVal) -> clearComboError(roleComboBox, roleError));
     }
 
+    @FXML
+    private void handleUsernameAction() {
+        if (ValidationUtil.isEmpty(usernameField.getText().trim())) {
+            showError(usernameError, "Username is required");
+            highlightError(usernameField);
+        }
+        passwordField.requestFocus();
+    }
+
+    @FXML
+    private void handlePasswordAction() {
+        // Validate password
+        if (ValidationUtil.isEmpty(passwordField.getText().trim())) {
+            showError(passwordError, "Password is required");
+            highlightError(passwordField);
+        }
+        roleComboBox.requestFocus();
+    }
+
     /**
      * Handle login button click or Enter key press
      */
@@ -49,17 +77,17 @@ public class LoginController implements Initializable {
     private void handleLogin() {
         // Clear all previous errors
         clearAllErrors();
-        
+
         // Get input values
         String username = usernameField.getText().trim();
         String password = passwordField.getText();
         String role = roleComboBox.getValue();
-        
+
         // Validate inputs
         if (!validateInputs(username, password, role)) {
             return;
         }
-        
+
         // Attempt authentication
         try {
             User user = authenticateUser(username, password, role);
@@ -70,7 +98,7 @@ public class LoginController implements Initializable {
                 // Authentication failed
                 showError(generalError, "Invalid username, password, or role. Please try again.");
             }
-            
+
         } catch (Exception e) {
             showError(generalError, "Login error: " + e.getMessage());
             e.printStackTrace();
@@ -82,28 +110,28 @@ public class LoginController implements Initializable {
      */
     private boolean validateInputs(String username, String password, String role) {
         boolean isValid = true;
-        
+
         // Validate username
         if (ValidationUtil.isEmpty(username)) {
             showError(usernameError, "Username is required");
             highlightError(usernameField);
             isValid = false;
         }
-        
+
         // Validate password
         if (ValidationUtil.isEmpty(password)) {
             showError(passwordError, "Password is required");
             highlightError(passwordField);
             isValid = false;
         }
-        
+
         // Validate role selection
         if (role == null || role.isEmpty()) {
             showError(roleError, "Please select a role");
             highlightError(roleComboBox);
             isValid = false;
         }
-        
+
         return isValid;
     }
 
@@ -112,10 +140,10 @@ public class LoginController implements Initializable {
      */
     public static User authenticateUser(String username, String password, String role) {
         UserDAO userDAO = new UserDAO();
-        
+
         // Normalize role to match database values
         String normalizedRole = normalizeRole(role);
-        
+
         // Query database for user with matching credentials
 
         return userDAO.authenticate(username, password, normalizedRole);
@@ -128,17 +156,17 @@ public class LoginController implements Initializable {
         try {
             switch (user.getRole().toLowerCase()) {
                 case "member":
-                    SceneManager.switchScene("MemberDashboard.fxml", "Member Dashboard", user);
+                    SceneManager.switchView("MemberDashboard.fxml", "Member Dashboard", user);
                     break;
-                    
+
                 case "librarian":
-                    SceneManager.switchScene("LibrarianDashboard.fxml", "Librarian Dashboard", user);
+                    SceneManager.switchView("LibrarianDashboard.fxml", "Librarian Dashboard", user);
                     break;
-                    
+
                 case "admin":
-                    SceneManager.switchScene("AdminDashboard.fxml", "Admin Dashboard", user);
+                    SceneManager.switchView("AdminDashboard.fxml", "Admin Dashboard", user);
                     break;
-                    
+
                 default:
                     showError(generalError, "Invalid user role");
             }
@@ -154,7 +182,7 @@ public class LoginController implements Initializable {
     @FXML
     private void handleApplyMembership() {
         try {
-            SceneManager.switchScene("MembershipApplication.fxml", "Apply for Membership", null);
+            SceneManager.switchView("MembershipApplication.fxml", "Apply for Membership", null);
         } catch (Exception e) {
             showError(generalError, "Navigation error: " + e.getMessage());
             e.printStackTrace();
@@ -176,7 +204,7 @@ public class LoginController implements Initializable {
     }
 
     // ==================== UI Helper Methods ====================
-    
+
     /**
      * Show error message and make label visible
      */
@@ -235,7 +263,7 @@ public class LoginController implements Initializable {
             generalError.setVisible(false);
             generalError.setManaged(false);
         }
-        
+
         // Clear field highlights
         usernameField.getStyleClass().remove("error-field");
         passwordField.getStyleClass().remove("error-field");
@@ -249,30 +277,5 @@ public class LoginController implements Initializable {
         if (control != null && !control.getStyleClass().contains("error-field")) {
             control.getStyleClass().add("error-field");
         }
-    }
-
-    // ==================== Testing Support Methods ====================
-    
-    /**
-     * Static test method for authentication logic
-     * Can be called without instantiating the controller
-     */
-    public static boolean testAuthentication(String username, String password, String role) {
-        User user = authenticateUser(username, password, role);
-        return user != null;
-    }
-
-    /**
-     * Get UserDAO instance for testing
-     */
-    public UserDAO getUserDAO() {
-        return userDAO;
-    }
-
-    /**
-     * Set UserDAO instance (useful for mocking in tests)
-     */
-    public void setUserDAO(UserDAO userDAO) {
-        this.userDAO = userDAO;
     }
 }

@@ -19,6 +19,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -47,6 +48,7 @@ public class LibrarianDashboardController implements Initializable {
     @FXML private Label overdueReturnsLabel;
     
     // Content pane (StackPane holding all views)
+    @FXML private StackPane contentPane;
     @FXML private VBox requestsView;
     @FXML private VBox inventoryView;
     @FXML private VBox membersView;

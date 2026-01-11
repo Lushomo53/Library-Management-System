@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Membership Approved</title>
+</head>
+<body style="
+    margin:0;
+    padding:0;
+    background-color:#f4f6f8;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+">
+
+<table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td align="center" style="padding:40px 20px;">
+
+            <!-- CARD -->
+            <table width="600" cellpadding="0" cellspacing="0" style="
+                background:#ffffff;
+                border-radius:16px;
+                box-shadow:0 10px 30px rgba(0,0,0,0.12);
+                overflow:hidden;
+            ">
+
+                <!-- HEADER -->
+                <tr>
+                    <td align="center" style="
+                        background: linear-gradient(135deg, #ff8c00, #ff6a00);
+                        padding:30px;
+                        color:#ffffff;
+                    ">
+                        <img src="{{LOGO_URL}}" alt="Library Logo"
+                             style="width:90px; margin-bottom:10px;">
+                        <h1 style="margin:0; font-size:26px;">
+                            Welcome to the Library
+                        </h1>
+                        <p style="margin-top:8px; opacity:0.95;">
+                            Membership Approved 🎉
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- CONTENT -->
+                <tr>
+                    <td style="padding:35px;">
+                        <h2 style="color:#333; margin-top:0;">
+                            Hello {{FULL_NAME}},
+                        </h2>
+
+                        <p style="font-size:15px; color:#555; line-height:1.6;">
+                            We’re excited to inform you that your application for
+                            <strong>Library Membership</strong> has been
+                            <span style="color:#4CAF50; font-weight:bold;">
+                                approved
+                            </span>.
+                        </p>
+
+                        <table width="100%" style="
+                            background:#f9fafb;
+                            border-radius:10px;
+                            padding:20px;
+                            margin:20px 0;
+                        ">
+                            <tr>
+                                <td style="color:#333; font-size:14px;">
+                                    <strong>Username:</strong>
+                                </td>
+                                <td style="color:#555; font-size:14px;">
+                                    {{USERNAME}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-top:8px; color:#333; font-size:14px;">
+                                    <strong>Approved On:</strong>
+                                </td>
+                                <td style="padding-top:8px; color:#555; font-size:14px;">
+                                    {{APPROVAL_DATE}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-top:8px; color:#333; font-size:14px;">
+                                    <strong>Status:</strong>
+                                </td>
+                                <td style="padding-top:8px;">
+                                    <span style="
+                                        background:#e8f5e9;
+                                        color:#2e7d32;
+                                        padding:6px 12px;
+                                        border-radius:20px;
+                                        font-size:13px;
+                                        font-weight:bold;
+                                    ">
+                                        ACTIVE MEMBER
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p style="font-size:15px; color:#555; line-height:1.6;">
+                            You may now log in and enjoy full access to our
+                            library services, including book borrowing,
+                            reservations, and account management.
+                        </p>
+
+                        <p style="margin-top:30px; color:#333;">
+                            Welcome aboard,<br>
+                            <strong>Library Management Team</strong>
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- FOOTER -->
+                <tr>
+                    <td align="center" style="
+                        background:#f0f2f5;
+                        padding:18px;
+                        font-size:12px;
+                        color:#777;
+                    ">
+                        This email was sent automatically.<br>
+                        Please do not reply to this message.
+                    </td>
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

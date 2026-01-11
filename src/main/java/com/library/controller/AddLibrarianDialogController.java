@@ -2,6 +2,7 @@ package com.library.controller;
 
 import com.library.dao.UserDAO;
 import com.library.model.User;
+import com.library.util.PasswordUtil;
 import com.library.util.SceneManager;
 import com.library.util.ValidationUtil;
 import javafx.fxml.FXML;
@@ -132,7 +133,7 @@ public class AddLibrarianDialogController implements Initializable {
             // Create librarian user
             User librarian = new User();
             librarian.setUsername(employeeId); // Employee ID is the username
-            librarian.setPassword(password); // TODO: Hash in production
+            librarian.setPassword(PasswordUtil.hashPassword(password));
             librarian.setRole("LIBRARIAN");
             librarian.setFullName(fullName);
             librarian.setEmail(email);

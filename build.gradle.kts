@@ -22,6 +22,17 @@ dependencies {
     // MySQL
     implementation("com.mysql:mysql-connector-j:9.3.0")
 
+    //by-crypt hashing
+    implementation("org.mindrot:jbcrypt:0.4")
+
+    //google auth api
+    implementation("com.google.api-client:google-api-client:2.4.0")
+    implementation("com.google.oauth-client:google-oauth-client-jetty:1.35.0")
+    implementation("com.google.apis:google-api-services-gmail:v1-rev20240520-2.0.0")
+
+    //email services
+    implementation("com.sun.mail:javax.mail:1.6.2")
+
     // Testing dependencies
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")

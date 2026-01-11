@@ -5,113 +5,140 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
+<?import java.lang.String?>
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.library.controller.ApproveRequestDialogController"
-      spacing="20" style="-fx-background-color: white; -fx-background-radius: 12;">
-
+      spacing="15" styleClass="dialog-container">
+    
     <padding>
-        <Insets top="25" right="25" bottom="25" left="25"/>
+        <Insets topRightBottomLeft="20"/>
     </padding>
 
-    <!-- Header -->
-    <HBox alignment="CENTER_LEFT" spacing="15">
-        <Label text="✅" style="-fx-font-size: 28px;"/>
-        <VBox spacing="5">
-            <Label text="Approve Borrow Request" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;"/>
-            <Label text="Set borrowing parameters for this request" style="-fx-font-size: 12px; -fx-text-fill: #666666;"/>
-        </VBox>
-    </HBox>
-
-    <Separator/>
-
-    <!-- Request Details (Read-only) -->
-    <VBox spacing="15" style="-fx-background-color: #FFF5EE; -fx-background-radius: 8; -fx-padding: 15;">
-        <Label text="Request Details" style="-fx-font-weight: bold; -fx-text-fill: #FF8C00; -fx-font-size: 14px;"/>
-
-        <GridPane hgap="15" vgap="10">
-            <columnConstraints>
-                <ColumnConstraints minWidth="100" prefWidth="120"/>
-                <ColumnConstraints hgrow="ALWAYS"/>
-            </columnConstraints>
-
-            <Label text="Request ID:" GridPane.columnIndex="0" GridPane.rowIndex="0"
-                   style="-fx-font-weight: bold; -fx-text-fill: #666666; -fx-font-size: 13px;"/>
-            <Label fx:id="requestIdLabel" text="REQ-001" GridPane.columnIndex="1" GridPane.rowIndex="0"
-                   style="-fx-text-fill: #333333; -fx-font-size: 13px;"/>
-
-            <Label text="Member:" GridPane.columnIndex="0" GridPane.rowIndex="1"
-                   style="-fx-font-weight: bold; -fx-text-fill: #666666; -fx-font-size: 13px;"/>
-            <Label fx:id="memberNameLabel" text="John Doe" GridPane.columnIndex="1" GridPane.rowIndex="1"
-                   style="-fx-text-fill: #333333; -fx-font-size: 13px;"/>
-
-            <Label text="Book Title:" GridPane.columnIndex="0" GridPane.rowIndex="2"
-                   style="-fx-font-weight: bold; -fx-text-fill: #666666; -fx-font-size: 13px;"/>
-            <Label fx:id="bookTitleLabel" text="The Great Gatsby" GridPane.columnIndex="1" GridPane.rowIndex="2"
-                   style="-fx-text-fill: #333333; -fx-font-size: 13px;"/>
-
-            <Label text="Request Date:" GridPane.columnIndex="0" GridPane.rowIndex="3"
-                   style="-fx-font-weight: bold; -fx-text-fill: #666666; -fx-font-size: 13px;"/>
-            <Label fx:id="requestDateLabel" text="2025-12-31" GridPane.columnIndex="1" GridPane.rowIndex="3"
-                   style="-fx-text-fill: #333333; -fx-font-size: 13px;"/>
-        </GridPane>
-    </VBox>
-
-    <Separator/>
-
-    <!-- Borrowing Parameters -->
-    <VBox spacing="15">
-        <Label text="Set Borrowing Parameters" style="-fx-font-weight: bold; -fx-text-fill: #333333; -fx-font-size: 14px;"/>
-
-        <!-- Borrow Duration -->
-        <VBox spacing="8">
-            <Label text="Borrow Duration (Days) *" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-            <HBox spacing="15" alignment="CENTER_LEFT">
-                <Spinner fx:id="durationSpinner" min="1" max="90" initialValue="14" editable="true" prefWidth="120"
-                         style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5;"/>
-                <Label text="Standard: 14 days" style="-fx-text-fill: #999999; -fx-font-size: 12px;"/>
+    <!-- Book Details Form -->
+    <ScrollPane fitToWidth="true" styleClass="form-scroll-pane"
+                maxHeight="800" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+        <VBox spacing="15">
+            <padding>
+                <Insets right="8"/>
+            </padding>
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="dialog-header">
+                <Label text="✅" styleClass="dialog-icon"/>
+                <VBox spacing="3">
+                    <Label text="Approve Borrow Request" styleClass="dialog-title"/>
+                    <Label text="Set borrowing parameters for this request" styleClass="dialog-subtitle"/>
+                </VBox>
             </HBox>
-            <Label fx:id="durationError" styleClass="error-label" managed="false" visible="false"/>
+
+            <Separator styleClass="dialog-separator"/>
+
+            <!-- Request Details (Read-only) -->
+            <VBox spacing="12" styleClass="info-section">
+                <padding>
+                    <Insets topRightBottomLeft="15"/>
+                </padding>
+
+                <Label text="📋 Request Details" styleClass="info-section-title"/>
+
+                <GridPane hgap="12" vgap="8">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="100" prefWidth="110"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
+
+                    <Label text="Request ID:" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                           styleClass="info-label"/>
+                    <Label fx:id="requestIdLabel" text="REQ-001" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                           styleClass="info-value"/>
+
+                    <Label text="Member:" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                           styleClass="info-label"/>
+                    <Label fx:id="memberNameLabel" text="John Doe" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                           styleClass="info-value"/>
+
+                    <Label text="Book Title:" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                           styleClass="info-label"/>
+                    <Label fx:id="bookTitleLabel" text="The Great Gatsby" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                           styleClass="info-value"/>
+
+                    <Label text="Request Date:" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                           styleClass="info-label"/>
+                    <Label fx:id="requestDateLabel" text="2025-12-31" GridPane.columnIndex="1" GridPane.rowIndex="3"
+                           styleClass="info-value"/>
+                </GridPane>
+            </VBox>
+
+            <Separator styleClass="dialog-separator"/>
+
+            <!-- Borrowing Parameters -->
+            <VBox spacing="12">
+                <Label text="⚙️Set Borrowing Parameters" styleClass="section-header-with-icon"/>
+
+                <!-- Borrow Duration -->
+                <VBox spacing="6">
+                    <HBox spacing="5" alignment="CENTER_LEFT">
+                        <Label text="Borrow Duration (Days)" styleClass="field-label"/>
+                        <Label text="*" styleClass="required-indicator"/>
+                    </HBox>
+                    <HBox spacing="12" alignment="CENTER_LEFT">
+                        <Spinner fx:id="durationSpinner" min="1" max="90" initialValue="14"
+                                 editable="true" prefWidth="120" styleClass="duration-spinner"/>
+                        <Label text="💡 Standard: 14 days" styleClass="hint-text"/>
+                    </HBox>
+                    <Label fx:id="durationError" styleClass="error-label" managed="false" visible="false"/>
+                </VBox>
+
+                <!-- Return Date (Calculated) -->
+                <VBox spacing="6">
+                    <Label text="Expected Return Date" styleClass="field-label"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="📅" styleClass="field-icon"/>
+                        <TextField fx:id="returnDateField" editable="false"
+                                   HBox.hgrow="ALWAYS" styleClass="readonly-field"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Allow Renewal -->
+                <VBox spacing="6">
+                    <Label text="Renewal Options" styleClass="field-label"/>
+                    <HBox styleClass="checkbox-container">
+                        <padding>
+                            <Insets topRightBottomLeft="8"/>
+                        </padding>
+                        <CheckBox fx:id="allowRenewalCheckbox" text="Allow member to renew this borrow"
+                                  selected="true" styleClass="renewal-checkbox"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Notes/Comments -->
+                <VBox spacing="6">
+                    <Label text="Notes (Optional)" styleClass="field-label"/>
+                    <TextArea fx:id="notesField" promptText="Add any special instructions or notes..."
+                              prefRowCount="3" wrapText="true" styleClass="notes-area"/>
+                    <Label text="💬 These notes will be visible to the member" styleClass="hint-text"/>
+                </VBox>
+            </VBox>
+
+            <!-- General Error/Success Message -->
+            <Label fx:id="generalMessage" wrapText="true" managed="false" visible="false"
+                   styleClass="message-label"/>
+
+            <!-- Action Buttons -->
+            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="dialog-button-bar">
+                <padding>
+                    <Insets top="5"/>
+                </padding>
+
+                <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel"
+                        styleClass="dialog-cancel-button" cancelButton="true"/>
+
+                <Button fx:id="approveButton" text="✓ Approve &amp; Issue Book" onAction="#handleApprove"
+                        defaultButton="true" styleClass="dialog-approve-button"/>
+            </HBox>
         </VBox>
-
-        <!-- Return Date (Calculated) -->
-        <VBox spacing="8">
-            <Label text="Expected Return Date" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-            <TextField fx:id="returnDateField" editable="false"
-                       style="-fx-background-color: #F5F5F5; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px; -fx-text-fill: #666666;"/>
-        </VBox>
-
-        <!-- Allow Renewal -->
-        <VBox spacing="8">
-            <Label text="Renewal Options" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-            <CheckBox fx:id="allowRenewalCheckbox" text="Allow member to renew this borrow" selected="true"
-                      style="-fx-text-fill: #666666; -fx-font-size: 13px;"/>
-        </VBox>
-
-        <!-- Notes/Comments -->
-        <VBox spacing="8">
-            <Label text="Notes (Optional)" style="-fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 13px;"/>
-            <TextArea fx:id="notesField" promptText="Add any special instructions or notes..." prefRowCount="3"
-                      style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #E0E0E0; -fx-border-width: 1.5; -fx-padding: 12; -fx-font-size: 14px;"/>
-        </VBox>
-    </VBox>
-
-    <!-- General Error/Success Message -->
-    <Label fx:id="generalMessage" wrapText="true" managed="false" visible="false"/>
-
-    <!-- Action Buttons -->
-    <HBox spacing="12" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
-        <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel"
-                style="-fx-background-color: transparent; -fx-text-fill: #666666; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-color: #E0E0E0; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 25; -fx-cursor: hand;"/>
-
-        <Button fx:id="approveButton" text="Approve & Issue Book" onAction="#handleApprove" defaultButton="true"
-                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 25; -fx-cursor: hand;">
-            <effect>
-                <javafx.scene.effect.DropShadow color="rgba(76, 175, 80, 0.3)" radius="8" offsetY="2"/>
-            </effect>
-        </Button>
-    </HBox>
+    </ScrollPane>
 
     <stylesheets>
-        <String fx:value="@../styles.css"/>
+        <String fx:value="/styles.css"/>
     </stylesheets>
 </VBox>

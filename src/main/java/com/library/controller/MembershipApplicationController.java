@@ -2,6 +2,7 @@ package com.library.controller;
 
 import com.library.dao.UserDAO;
 import com.library.model.User;
+import com.library.util.PasswordUtil;
 import com.library.util.SceneManager;
 import com.library.util.ValidationUtil;
 import javafx.fxml.FXML;
@@ -96,7 +97,7 @@ public class MembershipApplicationController implements Initializable {
         // Create new user object
         User newUser = new User();
         newUser.setUsername(username);
-        newUser.setPassword(password); // TODO: Hash password in production
+        newUser.setPassword(PasswordUtil.hashPassword(password));
         newUser.setRole("MEMBER");
         newUser.setFullName(fullName);
         newUser.setEmail(email);
@@ -136,94 +137,220 @@ public class MembershipApplicationController implements Initializable {
     }
 
     /**
-     * Validate all form inputs
+     * Validate all form inputs (Submit-level validation)
      */
-    private boolean validateInputs(String fullName, String email, String phone, String address, 
+    private boolean validateInputs(String fullName, String email, String phone, String address,
                                    String username, String password, String confirmPassword) {
+
         boolean isValid = true;
-        
-        // Validate full name
+
+        // Clear previous errors first (important for submit)
+        clearAllErrors();
+
+        if (!validateFullNameField()) {
+            isValid = false;
+        }
+
+        if (!validateEmailField()) {
+            isValid = false;
+        }
+
+        if (!validatePhoneField()) {
+            isValid = false;
+        }
+
+        if (!validateAddressField()) {
+            isValid = false;
+        }
+
+        if (!validateUsernameField()) {
+            isValid = false;
+        }
+
+        if (!validatePasswordField()) {
+            isValid = false;
+        }
+
+        if (!validateConfirmPasswordField()) {
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+
+    private boolean validateFullNameField() {
+        String fullName = fullNameField.getText().trim();
+
         if (ValidationUtil.isEmpty(fullName)) {
             showError(fullNameError, "Full name is required");
             highlightError(fullNameField);
-            isValid = false;
-        } else if (!ValidationUtil.isAlphabetic(fullName)) {
+            return false;
+        }
+        if (!ValidationUtil.isAlphabetic(fullName)) {
             showError(fullNameError, "Full name should only contain letters and spaces");
             highlightError(fullNameField);
-            isValid = false;
-        } else if (!ValidationUtil.isValidLength(fullName, 3, 100)) {
+            return false;
+        }
+        if (!ValidationUtil.isValidLength(fullName, 3, 100)) {
             showError(fullNameError, "Full name must be between 3 and 100 characters");
             highlightError(fullNameField);
-            isValid = false;
+            return false;
         }
-        
-        // Validate email
+        return true;
+    }
+
+    private boolean validateEmailField() {
+        String email = emailField.getText().trim();
+
         if (ValidationUtil.isEmpty(email)) {
             showError(emailError, "Email is required");
             highlightError(emailField);
-            isValid = false;
-        } else if (!ValidationUtil.isValidEmail(email)) {
+            return false;
+        }
+        if (!ValidationUtil.isValidEmail(email)) {
             showError(emailError, ValidationUtil.getEmailErrorMessage());
             highlightError(emailField);
-            isValid = false;
+            return false;
         }
-        
-        // Validate phone
+        return true;
+    }
+
+    private boolean validatePhoneField() {
+        String phone = phoneField.getText().trim();
+
         if (ValidationUtil.isEmpty(phone)) {
             showError(phoneError, "Phone number is required");
             highlightError(phoneField);
-            isValid = false;
-        } else if (!ValidationUtil.isValidPhone(phone)) {
+            return false;
+        }
+        if (!ValidationUtil.isValidPhone(phone)) {
             showError(phoneError, ValidationUtil.getPhoneErrorMessage());
             highlightError(phoneField);
-            isValid = false;
+            return false;
         }
-        
-        // Validate address
+        return true;
+    }
+
+    private boolean validateAddressField() {
+        String address = addressField.getText().trim();
+
         if (ValidationUtil.isEmpty(address)) {
             showError(addressError, "Address is required");
             highlightError(addressField);
-            isValid = false;
-        } else if (!ValidationUtil.isValidLength(address, 10, 500)) {
+            return false;
+        }
+        if (!ValidationUtil.isValidLength(address, 10, 500)) {
             showError(addressError, "Address must be between 10 and 500 characters");
             highlightError(addressField);
-            isValid = false;
+            return false;
         }
-        
-        // Validate username
+        return true;
+    }
+
+    private boolean validateUsernameField() {
+        String username = usernameField.getText().trim();
+
         if (ValidationUtil.isEmpty(username)) {
             showError(usernameError, "Username is required");
             highlightError(usernameField);
-            isValid = false;
-        } else if (!ValidationUtil.isValidUsername(username)) {
+            return false;
+        }
+        if (!ValidationUtil.isValidUsername(username)) {
             showError(usernameError, ValidationUtil.getUsernameErrorMessage());
             highlightError(usernameField);
-            isValid = false;
+            return false;
         }
-        
-        // Validate password
+        return true;
+    }
+
+    private boolean validatePasswordField() {
+        String password = passwordField.getText();
+
         if (ValidationUtil.isEmpty(password)) {
             showError(passwordError, "Password is required");
             highlightError(passwordField);
-            isValid = false;
-        } else if (!ValidationUtil.isValidPassword(password)) {
+            return false;
+        }
+        if (!ValidationUtil.isValidPassword(password)) {
             showError(passwordError, ValidationUtil.getPasswordErrorMessage());
             highlightError(passwordField);
-            isValid = false;
+            return false;
         }
-        
-        // Validate confirm password
+        return true;
+    }
+
+    private boolean validateConfirmPasswordField() {
+        String password = passwordField.getText();
+        String confirmPassword = confirmPasswordField.getText();
+
         if (ValidationUtil.isEmpty(confirmPassword)) {
             showError(confirmPasswordError, "Please confirm your password");
             highlightError(confirmPasswordField);
-            isValid = false;
-        } else if (!ValidationUtil.passwordsMatch(password, confirmPassword)) {
+            return false;
+        }
+        if (!ValidationUtil.passwordsMatch(password, confirmPassword)) {
             showError(confirmPasswordError, "Passwords do not match");
             highlightError(confirmPasswordField);
-            isValid = false;
+            return false;
         }
-        
-        return isValid;
+        return true;
+    }
+
+    @FXML
+    private void handleFullNameField() {
+        clearFieldError(fullNameField, fullNameError);
+        if (validateFullNameField()) {
+            emailField.requestFocus();
+        }
+    }
+
+    @FXML
+    private void handleEmailField() {
+        clearFieldError(emailField, emailError);
+        if (validateEmailField()) {
+            phoneField.requestFocus();
+        }
+    }
+
+    @FXML
+    private void handlePhoneField() {
+        clearFieldError(phoneField, phoneError);
+        if (validatePhoneField()) {
+            addressField.requestFocus();
+        }
+    }
+
+    @FXML
+    private void handleAddressField() {
+        clearFieldError(addressField, addressError);
+        if (validateAddressField()) {
+            usernameField.requestFocus();
+        }
+    }
+
+    @FXML
+    private void handleUsernameField() {
+        clearFieldError(usernameField, usernameError);
+        if (validateUsernameField()) {
+            passwordField.requestFocus();
+        }
+    }
+
+    @FXML
+    private void handlePasswordField() {
+        clearFieldError(passwordField, passwordError);
+        if (validatePasswordField()) {
+            confirmPasswordField.requestFocus();
+        }
+    }
+
+    @FXML
+    private void handleConfirmPasswordField() {
+        clearFieldError(confirmPasswordField, confirmPasswordError);
+        if (validateConfirmPasswordField()) {
+            submitButton.requestFocus();
+        }
     }
 
     /**
@@ -243,7 +370,7 @@ public class MembershipApplicationController implements Initializable {
     @FXML
     private void handleBackToLogin() {
         try {
-            SceneManager.switchScene("Login.fxml", "Library Management System - Login", null);
+            SceneManager.switchView("Login.fxml", "Library Management System - Login", null);
         } catch (Exception e) {
             showError(generalMessage, "Navigation error: " + e.getMessage());
             e.printStackTrace();

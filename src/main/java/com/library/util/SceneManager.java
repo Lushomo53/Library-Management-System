@@ -1,101 +1,152 @@
 package com.library.util;
 
 import com.library.model.User;
+import javafx.animation.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
+import java.util.Objects;
 
-/**
- * Utility class for managing scene transitions and window operations
- */
-public class SceneManager {
+public final class SceneManager {
 
     private static Stage primaryStage;
+    private static StackPane root;
     private static User currentUser;
 
-    /**
-     * Set the primary stage (call this from Main/Application class)
-     */
-    public static void setPrimaryStage(Stage stage) {
+    private static final Duration FADE_OUT = Duration.millis(180);
+    private static final Duration FADE_IN  = Duration.millis(220);
+    private static final Duration SLIDE    = Duration.millis(220);
+
+    private SceneManager() {}
+
+    /* =========================
+       INIT
+       ========================= */
+
+    public static void init(Stage stage, StackPane rootContainer) {
         primaryStage = stage;
+        root = rootContainer;
+
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(
+                Objects.requireNonNull(
+                        SceneManager.class.getResource("/styles.css")
+                ).toExternalForm()
+        );
+
+        primaryStage.getIcons().add(
+                new Image(
+                        Objects.requireNonNull(
+                                SceneManager.class.getResourceAsStream("/images/logo.jpg")
+                        )
+                )
+        );
+
+        primaryStage.setScene(scene);
+        primaryStage.setMinWidth(1000);
+        primaryStage.setMinHeight(700);
+        primaryStage.show();
     }
 
-    /**
-     * Get the primary stage
-     */
-    public static Stage getPrimaryStage() {
-        return primaryStage;
-    }
+    /* =========================
+       USER CONTEXT
+       ========================= */
 
-    /**
-     * Set the current logged-in user
-     */
     public static void setCurrentUser(User user) {
         currentUser = user;
     }
 
-    /**
-     * Get the current logged-in user
-     */
     public static User getCurrentUser() {
         return currentUser;
     }
 
-    /**
-     * Switch to a new scene
-     * 
-     * @param fxmlFile The FXML file name (must be in resources folder)
-     * @param title The window title
-     * @param user The user object to pass to the controller (can be null)
-     */
-    public static void switchScene(String fxmlFile, String title, User user) throws IOException {
-        if (primaryStage == null) {
-            throw new IllegalStateException("Primary stage not initialized. Call setPrimaryStage() first.");
-        }
+    /* =========================
+       VIEW SWITCHING (ANIMATED)
+       ========================= */
 
-        // Update current user
-        setCurrentUser(user);
+    public static void switchView(String fxml, String title, User user) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    SceneManager.class.getResource("/fxml/" + fxml)
+            );
 
-        // Load FXML
-        FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/fxml/" + fxmlFile));
-        Parent root = loader.load();
+            Parent newView = loader.load();
 
-        // Pass user to controller if it has a setUser method
-        Object controller = loader.getController();
-        if (controller != null && user != null) {
-            try {
-                controller.getClass().getMethod("setUser", User.class).invoke(controller, user);
-            } catch (Exception e) {
-                // Controller doesn't have setUser method, that's okay
+            Object controller = loader.getController();
+            if (controller != null && user != null) {
+                try {
+                    controller.getClass()
+                            .getMethod("setUser", User.class)
+                            .invoke(controller, user);
+                } catch (Exception ignored) {}
             }
+
+            setCurrentUser(user);
+            animateTransition(newView);
+            primaryStage.setTitle(title);
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        // Create and set scene
-        Scene scene = new Scene(root);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle(title);
-        primaryStage.show();
     }
 
-    /**
-     * Switch to a new scene without user parameter
-     */
-    public static void switchScene(String fxmlFile, String title) throws IOException {
-        switchScene(fxmlFile, title, null);
+    public static void switchView(String fxml, String title) {
+        switchView(fxml, title, null);
     }
 
-    /**
-     * Open a new modal dialog window
-     * 
-     * @param fxmlFile The FXML file name
-     * @param title The dialog title
-     * @return The controller of the loaded FXML
-     */
-    public static Object openDialog(String fxmlFile, String title) throws IOException {
+    private static void animateTransition(Parent newView) {
+
+        newView.setOpacity(0);
+        newView.setTranslateX(30);
+
+        if (!root.getChildren().isEmpty()) {
+            Parent oldView = (Parent) root.getChildren().getFirst();
+
+            FadeTransition fadeOut = new FadeTransition(FADE_OUT, oldView);
+            fadeOut.setToValue(0);
+
+            TranslateTransition slideOut = new TranslateTransition(SLIDE, oldView);
+            slideOut.setToX(-30);
+
+            ParallelTransition exit = new ParallelTransition(fadeOut, slideOut);
+            exit.setOnFinished(e -> {
+                root.getChildren().setAll(newView);
+                playEnterAnimation(newView);
+            });
+            exit.play();
+
+        } else {
+            root.getChildren().add(newView);
+            playEnterAnimation(newView);
+        }
+    }
+
+    private static void playEnterAnimation(Parent view) {
+
+        FadeTransition fadeIn = new FadeTransition(FADE_IN, view);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+
+        TranslateTransition slideIn = new TranslateTransition(SLIDE, view);
+        slideIn.setFromX(30);
+        slideIn.setToX(0);
+
+        new ParallelTransition(fadeIn, slideIn).play();
+    }
+
+    /* =========================
+       DIALOGS (YOUR CODE — KEPT)
+       ========================= */
+
+    public static DialogResult openDialog(String fxmlFile, String title) throws IOException {
         FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("/fxml/" + fxmlFile));
         Parent root = loader.load();
 
@@ -103,99 +154,99 @@ public class SceneManager {
         dialogStage.setTitle(title);
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.initOwner(primaryStage);
-        
+
         Scene scene = new Scene(root);
+        scene.getStylesheets().add(
+                Objects.requireNonNull(SceneManager.class.getResource("/styles.css")).toExternalForm()
+        );
+
         dialogStage.setScene(scene);
-        
-        // Don't show yet - let caller configure controller first
-        // dialogStage.showAndWait();
-        
-        // Return both stage and controller
+
+        dialogStage.setOnShown(event -> {
+            dialogStage.setX(primaryStage.getX() + (primaryStage.getWidth() - dialogStage.getWidth()) / 2);
+            dialogStage.setY(primaryStage.getY() + (primaryStage.getHeight() - dialogStage.getHeight()) / 2);
+        });
+
         return new DialogResult(dialogStage, loader.getController());
     }
 
-    /**
-     * Open a modal dialog and wait for it to close
-     */
     public static Object openDialogAndWait(String fxmlFile, String title) throws IOException {
-        DialogResult result = (DialogResult) openDialog(fxmlFile, title);
+        DialogResult result = openDialog(fxmlFile, title);
         result.getStage().showAndWait();
         return result.getController();
     }
 
-    /**
-     * Logout and return to login screen
-     */
-    public static void logout() {
-        try {
-            setCurrentUser(null);
-            switchScene("Login.fxml", "Library Management System - Login");
-        } catch (IOException e) {
-            System.err.println("Error during logout: " + e.getMessage());
-            e.printStackTrace();
+    /* =========================
+       ALERTS (YOUR CODE — KEPT)
+       ========================= */
+
+    public static void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        configureAlert(alert, title, message);
+        alert.showAndWait();
+    }
+
+    public static void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        configureAlert(alert, title, message);
+        alert.showAndWait();
+    }
+
+    public static boolean showConfirmation(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        configureAlert(alert, title, message);
+        return alert.showAndWait().filter(r -> r == ButtonType.OK).isPresent();
+    }
+
+    public static void showWarning(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        configureAlert(alert, title, message);
+        alert.showAndWait();
+    }
+
+    private static void configureAlert(Alert alert, String title, String message) {
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.initOwner(primaryStage);
+        alert.initModality(Modality.APPLICATION_MODAL);
+
+
+        DialogPane pane = alert.getDialogPane();
+
+        pane.getStylesheets().add(
+                Objects.requireNonNull(
+                        SceneManager.class.getResource("/styles.css")
+                ).toExternalForm()
+        );
+
+        pane.getStyleClass().add("dialog-pane");
+
+        // IMPORTANT: style buttons
+        Button ok = (Button) pane.lookupButton(ButtonType.OK);
+        if (ok != null) {
+            ok.getStyleClass().add("dialog-primary-button");
+        }
+
+        Button cancel = (Button) pane.lookupButton(ButtonType.CANCEL);
+        if (cancel != null) {
+            cancel.getStyleClass().add("dialog-cancel-button");
         }
     }
 
-    /**
-     * Show error alert dialog
-     */
-    public static void showError(String title, String message) {
-        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
-            javafx.scene.control.Alert.AlertType.ERROR
-        );
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    /* =========================
+       LOGOUT
+       ========================= */
+
+    public static void logout() {
+        setCurrentUser(null);
+        switchView("Login.fxml", "Library Management System");
     }
 
-    /**
-     * Show information alert dialog
-     */
-    public static void showInfo(String title, String message) {
-        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
-            javafx.scene.control.Alert.AlertType.INFORMATION
-        );
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
+    /* =========================
+       DIALOG RESULT
+       ========================= */
 
-    /**
-     * Show confirmation dialog
-     * 
-     * @return true if user clicked OK, false otherwise
-     */
-    public static boolean showConfirmation(String title, String message) {
-        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
-            javafx.scene.control.Alert.AlertType.CONFIRMATION
-        );
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        
-        return alert.showAndWait()
-            .filter(response -> response == javafx.scene.control.ButtonType.OK)
-            .isPresent();
-    }
-
-    /**
-     * Show warning alert dialog
-     */
-    public static void showWarning(String title, String message) {
-        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
-            javafx.scene.control.Alert.AlertType.WARNING
-        );
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    /**
-     * Inner class to hold dialog stage and controller
-     */
     public static class DialogResult {
         private final Stage stage;
         private final Object controller;
