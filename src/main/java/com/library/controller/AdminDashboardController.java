@@ -26,6 +26,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -578,34 +579,65 @@ public class AdminDashboardController implements Initializable {
             "Librarian: " + librarian.getFullName());
         // TODO: Implement edit librarian dialog
     }
-    
+
     private void handleDeactivateLibrarian(User librarian) {
         boolean confirmed = SceneManager.showConfirmation(
-            "Deactivate Librarian",
-            "Are you sure you want to deactivate this librarian?\n\n" +
-            "Name: " + librarian.getFullName() + "\n" +
-            "Employee ID: " + librarian.getEmployeeId()
+                "Deactivate Librarian",
+                "Are you sure you want to deactivate this librarian?\n\n" +
+                        "Name: " + librarian.getFullName() + "\n" +
+                        "Employee ID: " + librarian.getEmployeeId()
         );
-        
+
         if (!confirmed) return;
-        
+
         try {
             boolean success = userDAO.updateStatus(librarian.getUserId(), "INACTIVE");
-            
+
             if (success) {
                 SceneManager.showInfo("Success", "Librarian deactivated successfully!");
                 loadLibrariansData();
+
+                // 🔹 Send email in background thread
+                new Thread(() -> {
+                    try {
+                        String template = EmailTemplateLoader.loadTemplate(
+                                "librarian-deactivated.html"
+                        );
+
+                        String html = EmailTemplateLoader.render(
+                                template,
+                                Map.of(
+                                        "fullName", librarian.getFullName(),
+                                        "employeeId", librarian.getEmployeeId(),
+                                        "deactivationDate", LocalDate.now().toString(),
+                                        "libraryName", "Library Management System",
+                                        "logoUrl", "https://github.com/Lushomo53/Library-Management-System/blob/master/src/main/resources/images/logo.jpg?raw=true"
+                                )
+                        );
+
+                        EmailService.sendHtmlEmail(
+                                librarian.getEmail(),
+                                "Librarian Account Deactivated",
+                                html
+                        );
+
+                    } catch (Exception e) {
+                        System.err.println("Failed to send librarian deactivation email");
+                        e.printStackTrace();
+                    }
+                }).start();
+
             } else {
                 SceneManager.showError("Error", "Failed to deactivate librarian.");
             }
-            
+
         } catch (Exception e) {
             System.err.println("Error deactivating librarian: " + e.getMessage());
             e.printStackTrace();
             SceneManager.showError("Error", "Failed to deactivate librarian: " + e.getMessage());
         }
     }
-    
+
     @FXML
     private void handleLibrarianSearch() {
         String searchTerm = librarianSearchField.getText().trim();
@@ -791,48 +823,84 @@ public class AdminDashboardController implements Initializable {
             SceneManager.showError("Error", "Failed to approve member: " + e.getMessage());
         }
     }
-    
+
     private void handleRevokeMember(User member) {
-        // Check if member has active borrows
+        // Check active borrows
         try {
             int activeBooks = borrowedBookDAO.getActiveBorrowCount(member.getUserId());
             if (activeBooks > 0) {
-                SceneManager.showWarning("Cannot Revoke", 
-                    "This member has " + activeBooks + " books currently borrowed. " +
-                    "Cannot revoke membership until all books are returned.");
+                SceneManager.showWarning(
+                        "Cannot Revoke",
+                        "This member has " + activeBooks + " books currently borrowed.\n" +
+                                "Cannot revoke membership until all books are returned."
+                );
                 return;
             }
         } catch (Exception e) {
             System.err.println("Error checking member borrows: " + e.getMessage());
+            return;
         }
-        
+
+        //Confirm action
         boolean confirmed = SceneManager.showConfirmation(
-            "Revoke Membership",
-            "Are you sure you want to revoke membership for:\n\n" +
-            "Name: " + member.getFullName() + "\n" +
-            "Member ID: " + member.getMemberId() + "\n\n" +
-            "This will set their status to INACTIVE."
+                "Revoke Membership",
+                "Are you sure you want to revoke membership for:\n\n" +
+                        "Name: " + member.getFullName() + "\n" +
+                        "Member ID: " + member.getMemberId() + "\n\n" +
+                        "This will set their status to INACTIVE."
         );
-        
+
         if (!confirmed) return;
-        
+
+        //Update status
         try {
             boolean success = userDAO.updateStatus(member.getUserId(), "INACTIVE");
-            
-            if (success) {
-                SceneManager.showInfo("Success", "Membership revoked successfully!");
-                loadMembersData();
-            } else {
+
+            if (!success) {
                 SceneManager.showError("Error", "Failed to revoke membership.");
+                return;
             }
-            
+
+            SceneManager.showInfo("Success", "Membership revoked successfully!");
+            loadMembersData();
+
+            //Send email asynchronously
+            new Thread(() -> {
+                try {
+                    String template = EmailTemplateLoader.loadTemplate("membership-revoked.html");
+
+                    String html = EmailTemplateLoader.render(
+                            template,
+                            Map.of(
+                                    "memberName", member.getFullName(),
+                                    "revocationDate", LocalDate.now().toString(),
+                                    "libraryName", "Library Management System",
+                                    "logoUrl", "https://github.com/Lushomo53/Library-Management-System/blob/master/src/main/resources/images/logo.jpg?raw=true"
+                            )
+                    );
+
+                    EmailService.sendHtmlEmail(
+                            member.getEmail(),
+                            "Library Membership Revoked",
+                            html
+                    );
+
+                } catch (Exception e) {
+                    System.err.println("Failed to send revocation email");
+                    e.printStackTrace();
+                }
+            }).start();
+
         } catch (Exception e) {
             System.err.println("Error revoking member: " + e.getMessage());
             e.printStackTrace();
-            SceneManager.showError("Error", "Failed to revoke membership: " + e.getMessage());
+            SceneManager.showError(
+                    "Error",
+                    "Failed to revoke membership: " + e.getMessage()
+            );
         }
     }
-    
+
     @FXML
     private void handleMemberSearch() {
         String searchTerm = memberSearchField.getText().trim();

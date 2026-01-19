@@ -1080,6 +1080,59 @@
     -fx-min-width: 80px;
 }
 
+/* ==============================
+   TEXT INPUT FIELD
+   ============================== */
+
+.dialog-pane TextField {
+    -fx-pref-height: 38px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1;
+    -fx-padding: 0 12px;
+    -fx-font-size: 14px;
+}
+
+.dialog-pane TextField:focused {
+    -fx-border-color: #ff9800;
+    -fx-border-width: 2;
+    -fx-background-color: #ffffff;
+}
+
+/* ==============================
+   BUTTON BAR
+   ============================== */
+
+.dialog-pane .button-bar {
+    -fx-padding: 15px 0 0 0;
+}
+
+/* Primary button (OK / YES) */
+.dialog-pane .button-bar .button:default {
+    -fx-background-color: #ff9800;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 20px;
+}
+
+.dialog-pane .button-bar .button:default:hover {
+    -fx-background-color: #fb8c00;
+}
+
+/* Cancel button */
+.dialog-pane .button-bar .button {
+    -fx-background-color: #e0e0e0;
+    -fx-text-fill: #333333;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 20px;
+}
+
+.dialog-pane .button-bar .button:hover {
+    -fx-background-color: #d5d5d5;
+}
+
 /* ============================================
    Separator Styles
    ============================================ */

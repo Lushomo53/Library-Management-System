@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Librarian Account Deactivated</title>
+</head>
+<body style="margin:0; padding:0; font-family:'Segoe UI', Arial, sans-serif; background-color:#f4f6f8;">
+<table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+        <td align="center" style="padding:30px 0;">
+            <table width="600" style="background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.08);">
+
+                <!-- Header -->
+                <tr>
+                    <td align="center" style="background:#ff8c00; padding:25px;">
+                        <img src="{{logoUrl}}" alt="Library Logo" width="80" style="margin-bottom:10px;">
+                        <h1 style="margin:0; color:#ffffff;">Account Deactivated</h1>
+                    </td>
+                </tr>
+
+                <!-- Body -->
+                <tr>
+                    <td style="padding:30px; color:#333333;">
+                        <p style="font-size:16px;">
+                            Hello <strong>{{fullName}}</strong>,
+                        </p>
+
+                        <p style="font-size:15px;">
+                            This email is to inform you that your librarian account has been
+                            <strong>deactivated</strong> in the Library Management System.
+                        </p>
+
+                        <table width="100%" style="margin:20px 0; border-collapse:collapse;">
+                            <tr>
+                                <td style="padding:8px; font-weight:bold;">Employee ID:</td>
+                                <td style="padding:8px;">{{employeeId}}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:8px; font-weight:bold;">Deactivation Date:</td>
+                                <td style="padding:8px;">{{deactivationDate}}</td>
+                            </tr>
+                        </table>
+
+                        <p style="font-size:15px;">
+                            As of this date, you will no longer have access to librarian features.
+                        </p>
+
+                        <p style="font-size:15px;">
+                            If you believe this action was taken in error or require clarification,
+                            please contact the system administrator.
+                        </p>
+
+                        <p style="margin-top:30px;">
+                            Regards,<br>
+                            <strong>{{libraryName}}</strong>
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td align="center" style="background:#f1f1f1; padding:15px; font-size:12px; color:#777;">
+                        This is an automated notification. Please do not reply.
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

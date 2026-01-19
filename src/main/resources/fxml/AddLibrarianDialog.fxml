@@ -39,7 +39,7 @@
             <!-- Employee ID -->
             <VBox spacing="6">
                 <HBox spacing="5" alignment="CENTER_LEFT">
-                    <Label text="Employee ID" styleClass="field-label"/>
+                    <Label text="Username" styleClass="field-label"/>
                     <Label text="*" styleClass="required-indicator"/>
                 </HBox>
                 <HBox spacing="8" alignment="CENTER_LEFT">
@@ -87,7 +87,7 @@
                 </HBox>
                 <HBox spacing="8" alignment="CENTER_LEFT">
                     <Label text="📱" styleClass="field-icon"/>
-                    <TextField fx:id="phoneField" promptText="+1 (555) 000-0000"
+                    <TextField fx:id="phoneField" promptText="(+260) 987654321"
                               HBox.hgrow="ALWAYS" styleClass="form-text-field"/>
                 </HBox>
                 <Label fx:id="phoneError" styleClass="error-label" managed="false" visible="false"/>
@@ -116,7 +116,7 @@
             <!-- Initial Password -->
             <VBox spacing="6">
                 <HBox spacing="5" alignment="CENTER_LEFT">
-                    <Label text="Initial Password" styleClass="field-label"/>
+                    <Label text="Create Password" styleClass="field-label"/>
                     <Label text="*" styleClass="required-indicator"/>
                 </HBox>
                 <HBox spacing="8" alignment="CENTER_LEFT">

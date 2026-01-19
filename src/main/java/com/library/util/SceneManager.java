@@ -160,6 +160,14 @@ public final class SceneManager {
                 Objects.requireNonNull(SceneManager.class.getResource("/styles.css")).toExternalForm()
         );
 
+        primaryStage.getIcons().add(
+                new Image(
+                        Objects.requireNonNull(
+                                SceneManager.class.getResourceAsStream("/images/logo.jpg")
+                        )
+                )
+        );
+
         dialogStage.setScene(scene);
 
         dialogStage.setOnShown(event -> {

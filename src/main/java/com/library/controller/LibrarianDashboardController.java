@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class LibrarianDashboardController implements Initializable {
@@ -418,24 +419,60 @@ public class LibrarianDashboardController implements Initializable {
     }
 
     private void handleRejectRequest(BorrowRequest request) {
-        // Show reason dialog
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Reject Request");
         dialog.setHeaderText("Reject borrow request for: " + request.getBook().getTitle());
         dialog.setContentText("Reason for rejection:");
-        
+
+        dialog.getDialogPane().getStylesheets().add(
+                Objects.requireNonNull(getClass().getResource("/styles.css")).toExternalForm()
+        );
+
         dialog.showAndWait().ifPresent(reason -> {
             try {
-                boolean success = borrowRequestDAO.rejectRequest(request.getRequestId(), reason);
-                
+                boolean success = borrowRequestDAO.rejectRequest(
+                        request.getRequestId(), reason
+                );
+
                 if (success) {
                     SceneManager.showInfo("Success", "Request rejected successfully!");
                     loadStatistics();
                     loadRequests();
+
+                    // SEND REJECTION EMAIL (ASYNC)
+                    new Thread(() -> {
+                        try {
+                            String template = EmailTemplateLoader
+                                    .loadTemplate("borrow-rejected.html");
+
+                            Map<String, String> values = Map.of(
+                                    "logoUrl", "https://github.com/Lushomo53/Library-Management-System/blob/master/src/main/resources/images/logo.jpg?raw=true",
+                                    "memberName", request.getMember().getFullName(),
+                                    "bookTitle", request.getBook().getTitle(),
+                                    "author", request.getBook().getAuthor(),
+                                    "rejectionReason", reason,
+                                    "rejectionDate", java.time.LocalDate.now().toString(),
+                                    "libraryName", "Library Management System"
+                            );
+
+                            String html = EmailTemplateLoader.render(template, values);
+
+                            EmailService.sendHtmlEmail(
+                                    request.getMember().getEmail(),
+                                    "Borrow Request Rejected – " + request.getBook().getTitle(),
+                                    html
+                            );
+
+                        } catch (Exception e) {
+                            System.err.println("Failed to send rejection email");
+                            e.printStackTrace();
+                        }
+                    }).start();
+
                 } else {
                     SceneManager.showError("Error", "Failed to reject request.");
                 }
-                
+
             } catch (Exception e) {
                 System.err.println("Error rejecting request: " + e.getMessage());
                 e.printStackTrace();
@@ -654,17 +691,78 @@ public class LibrarianDashboardController implements Initializable {
     }
 
     // ==================== Quick Actions ====================
-    
+
     @FXML
     private void handleIssueBook() {
-        SceneManager.showInfo("Issue Book", "Issue book functionality - Opens book issuing dialog");
-        // TODO: Implement issue book dialog
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/IssueBookDialog.fxml")
+            );
+            Parent root = loader.load();
+
+            IssueBookDialogController controller = loader.getController();
+            controller.setLibrarian(currentUser);
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Issue Book");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(requestsTabButton.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+
+            controller.setOnIssued(() -> {
+                // Refresh dashboard data
+                loadStatistics();
+                loadRequests();
+                loadInventory();
+                SceneManager.showInfo("Success", "Book issued successfully!");
+            });
+
+            dialogStage.showAndWait();
+
+        } catch (IOException e) {
+            System.err.println("Error opening issue book dialog: " + e.getMessage());
+            e.printStackTrace();
+            SceneManager.showError(
+                    "Error",
+                    "Failed to open issue book dialog: " + e.getMessage()
+            );
+        }
     }
-    
+
     @FXML
     private void handleReturnBook() {
-        SceneManager.showInfo("Return Book", "Return book functionality - Opens book return dialog");
-        // TODO: Implement return book dialog
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/ReturnBookDialog.fxml")
+            );
+            Parent root = loader.load();
+
+            ReturnBookDialogController controller = loader.getController();
+            controller.setLibrarian(currentUser);
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Return Book");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(requestsTabButton.getScene().getWindow());
+            dialogStage.setScene(new Scene(root));
+
+            controller.setOnReturned(() -> {
+                // Refresh dashboard data
+                loadStatistics();
+                loadInventory();
+                SceneManager.showInfo("Success", "Book returned successfully!");
+            });
+
+            dialogStage.showAndWait();
+
+        } catch (IOException e) {
+            System.err.println("Error opening return book dialog: " + e.getMessage());
+            e.printStackTrace();
+            SceneManager.showError(
+                    "Error",
+                    "Failed to open return book dialog: " + e.getMessage()
+            );
+        }
     }
 
     // ==================== Logout ====================

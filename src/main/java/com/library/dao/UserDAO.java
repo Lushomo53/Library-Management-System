@@ -71,28 +71,37 @@ public class UserDAO {
     }
 
     /**
-     * Find user by username
+     * Find user by partial username or email
      */
-    public User findByUsername(String username) {
-        String query = "SELECT * FROM users WHERE username = ?";
-        
+    public User findByUsername(String value) {
+        String query = """
+        SELECT *
+        FROM users
+        WHERE LOWER(username) LIKE LOWER(?)
+           OR LOWER(email) LIKE LOWER(?)
+        """;
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
-            
-            pstmt.setString(1, username);
+
+            String pattern = "%" + value + "%";
+            pstmt.setString(1, pattern);
+            pstmt.setString(2, pattern);
+
             ResultSet rs = pstmt.executeQuery();
-            
+
             if (rs.next()) {
                 return extractUserFromResultSet(rs);
             }
-            
+
         } catch (SQLException e) {
-            System.err.println("Error finding user by username: " + e.getMessage());
+            System.err.println("Error finding user by username LIKE: " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         return null;
     }
+
 
     /**
      * Check if username already exists
@@ -336,6 +345,30 @@ public class UserDAO {
         }
         
         return users;
+    }
+
+    /**
+     * Find user by member ID
+     */
+    public User findByMemberId(String memberId) {
+        String query = "SELECT * FROM users WHERE member_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, memberId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return extractUserFromResultSet(rs);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error finding user by member ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     /**
