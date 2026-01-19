@@ -51,3 +51,6 @@ src/main/resources/google-client-secret.json
 # OAuth token storage (if you add it later)
 tokens/
 credentials/
+
+#env
+.env
