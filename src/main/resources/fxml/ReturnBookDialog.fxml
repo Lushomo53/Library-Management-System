@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+
+<?import javafx.collections.FXCollections?>
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.library.controller.ReturnBookDialogController"
+      styleClass="dialog-container" minWidth="550" maxWidth="650" prefWidth="600">
+    
+    <padding>
+        <Insets top="20" right="20" bottom="15" left="20"/>
+    </padding>
+    
+    <!-- Fixed Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12" styleClass="dialog-header">
+        <Label text="📥" styleClass="dialog-icon"/>
+        <VBox spacing="3">
+            <Label text="Return Book" styleClass="dialog-title"/>
+            <Label text="Search for borrowed book to return" styleClass="dialog-subtitle"/>
+        </VBox>
+    </HBox>
+    
+    <Separator styleClass="dialog-separator">
+        <VBox.margin>
+            <Insets top="5" bottom="5"/>
+        </VBox.margin>
+    </Separator>
+
+    <!-- Scrollable Content -->
+    <ScrollPane fitToWidth="true" styleClass="form-scroll-pane"
+                prefHeight="450" maxHeight="550" 
+                hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                VBox.vgrow="ALWAYS">
+        <VBox spacing="15">
+            <padding>
+                <Insets top="5" right="8" bottom="5" left="5"/>
+            </padding>
+            
+            <!-- Search Section -->
+            <VBox spacing="12">
+                <Label text="🔍 Search Borrowed Book" styleClass="section-header-with-icon"/>
+                
+                <!-- Search Options -->
+                <VBox spacing="6">
+                    <Label text="Search by Book or Member" styleClass="field-label"/>
+                    <HBox spacing="8">
+                        <TextField fx:id="searchField" promptText="Enter ISBN, Book Title, Member ID, or Username..." 
+                                  HBox.hgrow="ALWAYS" styleClass="form-text-field"/>
+                        <Button text="🔍 Search" onAction="#handleSearch" styleClass="search-button"/>
+                    </HBox>
+                    <Label fx:id="searchError" styleClass="error-label" managed="false" visible="false"/>
+                    <Label text="💡 Search by book details or member information" styleClass="hint-text"/>
+                </VBox>
+                
+                <!-- Search Results Table -->
+                <VBox spacing="8" fx:id="searchResultsSection" managed="false" visible="false">
+                    <Label text="Select Book to Return:" styleClass="field-label"/>
+                    <TableView fx:id="borrowedBooksTable" prefHeight="200" styleClass="data-table">
+                        <columns>
+                            <TableColumn fx:id="colBookTitle" text="Book Title" prefWidth="180"/>
+                            <TableColumn fx:id="colMemberName" text="Member" prefWidth="120"/>
+                            <TableColumn fx:id="colIssueDate" text="Issue Date" prefWidth="100"/>
+                            <TableColumn fx:id="colDueDate" text="Due Date" prefWidth="100"/>
+                            <TableColumn fx:id="colStatus" text="Status" prefWidth="80"/>
+                        </columns>
+                    </TableView>
+                    <Label text="💡 Click a row to select the book for return" styleClass="hint-text"/>
+                </VBox>
+            </VBox>
+            
+            <Separator styleClass="section-divider" fx:id="detailsSeparator" 
+                      managed="false" visible="false"/>
+            
+            <!-- Borrow Details Section -->
+            <VBox spacing="12" fx:id="borrowDetailsSection" managed="false" visible="false">
+                <Label text="📋 Borrow Details" styleClass="section-header-with-icon"/>
+                
+                <VBox spacing="8" styleClass="info-section">
+                    <padding>
+                        <Insets topRightBottomLeft="12"/>
+                    </padding>
+                    
+                    <GridPane hgap="12" vgap="6">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="100" prefWidth="110"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        
+                        <Label text="Book:" GridPane.columnIndex="0" GridPane.rowIndex="0" 
+                               styleClass="info-label"/>
+                        <Label fx:id="detailBookLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                               styleClass="info-value" wrapText="true"/>
+                        
+                        <Label text="Member:" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                               styleClass="info-label"/>
+                        <Label fx:id="detailMemberLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                               styleClass="info-value"/>
+                        
+                        <Label text="Issue Date:" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                               styleClass="info-label"/>
+                        <Label fx:id="detailIssueDateLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                               styleClass="info-value"/>
+                        
+                        <Label text="Due Date:" GridPane.columnIndex="0" GridPane.rowIndex="3"
+                               styleClass="info-label"/>
+                        <Label fx:id="detailDueDateLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3"
+                               styleClass="info-value"/>
+                        
+                        <Label text="Days Elapsed:" GridPane.columnIndex="0" GridPane.rowIndex="4"
+                               styleClass="info-label"/>
+                        <Label fx:id="detailDaysElapsedLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4"
+                               styleClass="info-value"/>
+                    </GridPane>
+                    
+                    <!-- Overdue Warning -->
+                    <HBox fx:id="overdueWarningBox" spacing="8" alignment="CENTER_LEFT" 
+                          styleClass="warning-box" managed="false" visible="false">
+                        <padding>
+                            <Insets topRightBottomLeft="10"/>
+                        </padding>
+                        <Label text="⚠️" style="-fx-font-size: 16px;"/>
+                        <Label fx:id="overdueWarningLabel" text="Book is overdue!" 
+                               wrapText="true" HBox.hgrow="ALWAYS" styleClass="warning-text"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+            
+            <Separator styleClass="section-divider" fx:id="returnParamsSeparator" 
+                      managed="false" visible="false"/>
+            
+            <!-- Return Parameters -->
+            <VBox spacing="12" fx:id="returnParametersSection" managed="false" visible="false">
+                <Label text="⚙️ Return Information" styleClass="section-header-with-icon"/>
+                
+                <!-- Return Date -->
+                <VBox spacing="6">
+                    <Label text="Return Date" styleClass="field-label"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="📅" styleClass="field-icon"/>
+                        <TextField fx:id="returnDateField" editable="false" 
+                                  HBox.hgrow="ALWAYS" styleClass="readonly-field"/>
+                    </HBox>
+                    <Label text="💡 Automatically set to today" styleClass="hint-text"/>
+                </VBox>
+                
+                <!-- Book Condition -->
+                <VBox spacing="6">
+                    <Label text="Book Condition" styleClass="field-label"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="📖" styleClass="field-icon"/>
+                        <ComboBox fx:id="conditionComboBox" promptText="Select condition" 
+                                 maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="form-combo-box">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Good"/>
+                                    <String fx:value="Fair"/>
+                                    <String fx:value="Damaged"/>
+                                    <String fx:value="Lost"/>
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                    </HBox>
+                </VBox>
+                
+                <!-- Late Fee (if overdue) -->
+                <VBox spacing="6" fx:id="lateFeeSection" managed="false" visible="false">
+                    <Label text="Late Fee" styleClass="field-label"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="💰" styleClass="field-icon"/>
+                        <TextField fx:id="lateFeeField" promptText="0.00" 
+                                  HBox.hgrow="ALWAYS" styleClass="form-text-field"/>
+                    </HBox>
+                    <Label fx:id="lateFeeHint" text="💡 Late fee calculated" styleClass="hint-text"/>
+                </VBox>
+                
+                <!-- Damage Fee (if damaged/lost) -->
+                <VBox spacing="6" fx:id="damageFeeSection" managed="false" visible="false">
+                    <Label text="Damage/Replacement Fee" styleClass="field-label"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="💸" styleClass="field-icon"/>
+                        <TextField fx:id="damageFeeField" promptText="0.00" 
+                                  HBox.hgrow="ALWAYS" styleClass="form-text-field"/>
+                    </HBox>
+                    <Label text="💡 Enter amount for damaged or lost book" styleClass="hint-text"/>
+                </VBox>
+                
+                <!-- Total Fees -->
+                <VBox spacing="6" fx:id="totalFeeSection" managed="false" visible="false">
+                    <Label text="Total Fees" styleClass="field-label"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="💵" styleClass="field-icon"/>
+                        <TextField fx:id="totalFeeField" editable="false" 
+                                  HBox.hgrow="ALWAYS" styleClass="readonly-field"/>
+                    </HBox>
+                </VBox>
+                
+                <!-- Return Notes -->
+                <VBox spacing="6">
+                    <Label text="Return Notes (Optional)" styleClass="field-label"/>
+                    <TextArea fx:id="returnNotesField" promptText="Add any notes about the return..." 
+                             prefRowCount="3" wrapText="true" styleClass="form-text-area"/>
+                </VBox>
+            </VBox>
+            
+            <!-- General Message -->
+            <Label fx:id="generalMessage" wrapText="true" managed="false" visible="false" 
+                   styleClass="message-label"/>
+            
+            <!-- Spacer -->
+            <Region prefHeight="10"/>
+        </VBox>
+    </ScrollPane>
+
+    <!-- Fixed Footer -->
+    <VBox spacing="8">
+        <VBox.margin>
+            <Insets top="10"/>
+        </VBox.margin>
+        
+        <Separator styleClass="dialog-separator"/>
+        
+        <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="dialog-button-bar">
+            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel"
+                    styleClass="dialog-cancel-button" cancelButton="true"/>
+
+            <Button fx:id="returnButton" text="📥 Process Return" onAction="#handleReturnBook" 
+                    defaultButton="true" styleClass="success-button" disable="true"/>
+        </HBox>
+    </VBox>
+
+    <stylesheets>
+        <String fx:value="/styles.css"/>
+    </stylesheets>
+</VBox>
