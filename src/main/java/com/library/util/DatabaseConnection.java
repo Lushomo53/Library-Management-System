@@ -8,12 +8,6 @@ import java.sql.SQLException;
  * Singleton database connection utility
  */
 public class DatabaseConnection {
-    
-    // Database configuration
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/library_db";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "";
-
     private static Connection connection = null;
 
     /**
@@ -36,7 +30,7 @@ public class DatabaseConnection {
             
             // Create connection if it doesn't exist or is closed
             if (connection == null || connection.isClosed()) {
-                connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+                connection = DriverManager.getConnection(EnvLoader.get("DB_URL"), EnvLoader.get("DB_USER"), EnvLoader.get("DB_PASSWORD"));
             }
             
             return connection;
@@ -58,7 +52,7 @@ public class DatabaseConnection {
     public static Connection getNewConnection() throws SQLException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            return DriverManager.getConnection(EnvLoader.get("DB_URL"), EnvLoader.get("DB_USER"), EnvLoader.get("DB_PASSWORD"));
         } catch (ClassNotFoundException e) {
             System.err.println("MySQL JDBC Driver not found!");
             e.printStackTrace();
@@ -92,12 +86,5 @@ public class DatabaseConnection {
             System.err.println("Database connection test failed: " + e.getMessage());
             return false;
         }
-    }
-
-    /**
-     * Get connection URL for configuration purposes
-     */
-    public static String getDbUrl() {
-        return DB_URL;
     }
 }

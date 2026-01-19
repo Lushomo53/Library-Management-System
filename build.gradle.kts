@@ -33,6 +33,9 @@ dependencies {
     //email services
     implementation("com.sun.mail:javax.mail:1.6.2")
 
+    //pdf export tools
+    implementation("com.github.librepdf:openpdf:1.3.32")
+
     // Testing dependencies
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")

@@ -18,12 +18,17 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -32,6 +37,26 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+
+import java.awt.Color;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.time.LocalDate;
+
+import javafx.collections.ObservableList;
+
 
 public class AdminDashboardController implements Initializable {
 
@@ -1252,12 +1277,93 @@ public class AdminDashboardController implements Initializable {
         row3.add("N/A");
         reportDataList.add(row3);
     }
-    
+
     @FXML
     private void handleExportPDF() {
-        SceneManager.showInfo("Export PDF", 
-            "Export to PDF functionality - Would export current report to PDF file");
-        // TODO: Implement PDF export using iText or similar library
+        if (reportDataList.isEmpty()) {
+            SceneManager.showWarning("No Data", "Generate a report before exporting.");
+            return;
+        }
+
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Export Report to PDF");
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+        );
+
+        chooser.setInitialFileName(
+                reportTypeCombo.getValue().replace(" ", "_") + ".pdf"
+        );
+
+        File file = chooser.showSaveDialog(reportDataTable.getScene().getWindow());
+
+        if (file == null) return;
+
+        try {
+            exportCurrentReportToPDF(file);
+            SceneManager.showInfo("Export Successful", "PDF exported successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            SceneManager.showError("Export Failed", e.getMessage());
+        }
+    }
+
+    private void exportCurrentReportToPDF(File file) throws Exception {
+        Document document = new Document(PageSize.A4.rotate());
+        PdfWriter.getInstance(document, new FileOutputStream(file));
+        document.open();
+
+        // ===== Title =====
+        Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD);
+        Paragraph title = new Paragraph(reportTypeCombo.getValue(), titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingAfter(20);
+        document.add(title);
+
+        // ===== Metadata =====
+        Font metaFont = new Font(Font.HELVETICA, 10, Font.ITALIC);
+        Paragraph meta = new Paragraph(
+                "Generated on: " + LocalDate.now() + "\n",
+                metaFont
+        );
+        meta.setSpacingAfter(15);
+        document.add(meta);
+
+        // ===== Table =====
+        PdfPTable table = new PdfPTable(5);
+        table.setWidthPercentage(100);
+        table.setSpacingBefore(10);
+
+        table.setWidths(new float[]{3, 3, 3, 2, 2}); // column widths
+
+        Font headerFont = new Font(Font.HELVETICA, 11, Font.BOLD);
+        Font cellFont = new Font(Font.HELVETICA, 10);
+
+        // Headers
+        addHeaderCell(table, reportCol1.getText(), headerFont);
+        addHeaderCell(table, reportCol2.getText(), headerFont);
+        addHeaderCell(table, reportCol3.getText(), headerFont);
+        addHeaderCell(table, reportCol4.getText(), headerFont);
+        addHeaderCell(table, reportCol5.getText(), headerFont);
+
+        // Rows
+        for (ObservableList<String> row : reportDataList) {
+            for (int i = 0; i < 5; i++) {
+                String value = row.size() > i ? row.get(i) : "";
+                table.addCell(new PdfPCell(new Phrase(value, cellFont)));
+            }
+        }
+
+        document.add(table);
+        document.close();
+    }
+
+    private void addHeaderCell(PdfPTable table, String text, Font font) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, font));
+        cell.setBackgroundColor(new Color(245, 124, 0)); // orange theme
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        cell.setPadding(6);
+        table.addCell(cell);
     }
 
     // ==================== Logout ====================

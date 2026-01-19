@@ -23,19 +23,35 @@ public class BorrowedBookDAO {
        ISSUE BOOK (transaction-safe, canonical version)
        ===================================================== */
     public boolean issueBook(BorrowedBook borrowedBook) {
+
         String insertSql =
                 "INSERT INTO borrowed_books (" +
                         "request_id, member_id, book_id, issued_by, " +
                         "issue_date, due_date, status, allow_renewal, notes" +
-                        ") VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?, ?)";
+                        ") VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, 'ISSUED', ?, ?)";
 
-        String updateBookSql =
-                "UPDATE books SET available_copies = available_copies - 1 " +
-                        "WHERE book_id = ? AND available_copies > 0";
+        // Guard check: ensure book is available BEFORE issuing
+        String availabilityCheckSql =
+                "SELECT available_copies FROM books WHERE book_id = ? FOR UPDATE";
 
         try (Connection conn = DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
 
+            // 🔒 Lock book row & check availability
+            try (PreparedStatement checkStmt =
+                         conn.prepareStatement(availabilityCheckSql)) {
+
+                checkStmt.setInt(1, borrowedBook.getBookId());
+
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (!rs.next() || rs.getInt("available_copies") <= 0) {
+                        conn.rollback();
+                        return false; // No copies available
+                    }
+                }
+            }
+
+            // 📚 Insert borrowed book (trigger will decrement copies)
             try (PreparedStatement insertStmt =
                          conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -44,9 +60,8 @@ public class BorrowedBookDAO {
                 insertStmt.setInt(3, borrowedBook.getBookId());
                 insertStmt.setInt(4, borrowedBook.getIssuedBy());
                 insertStmt.setDate(5, Date.valueOf(borrowedBook.getDueDate()));
-                insertStmt.setString(6, borrowedBook.getStatus()); // ISSUED
-                insertStmt.setBoolean(7, borrowedBook.isAllowRenewal());
-                insertStmt.setString(8, borrowedBook.getNotes());
+                insertStmt.setBoolean(6, borrowedBook.isAllowRenewal());
+                insertStmt.setString(7, borrowedBook.getNotes());
 
                 int rows = insertStmt.executeUpdate();
                 if (rows == 0) {
@@ -59,12 +74,6 @@ public class BorrowedBookDAO {
                         borrowedBook.setBorrowId(keys.getInt(1));
                     }
                 }
-            }
-
-            try (PreparedStatement updateBookStmt =
-                         conn.prepareStatement(updateBookSql)) {
-                updateBookStmt.setInt(1, borrowedBook.getBookId());
-                updateBookStmt.executeUpdate();
             }
 
             conn.commit();
